@@ -1303,11 +1303,17 @@
     // Fetch passages from API
     async function fetchPassages(retryCount = 0) {
       try {
-        const apiUrl = window.location.hostname === 'localhost' 
+        // Determine if we're in development or production
+        const isLocalhost = window.location.hostname === 'localhost' || 
+                           window.location.hostname === '127.0.0.1' ||
+                           window.location.hostname === '::1';
+        
+        const apiUrl = isLocalhost 
           ? 'http://localhost:6000/api'
           : 'https://typinghub.in/api';
-          
-        console.log('Fetching passages from:', apiUrl);
+        
+        console.log('Current hostname:', window.location.hostname);
+        console.log('Using API URL:', apiUrl);
         
         const response = await fetch(`${apiUrl}/passages/test/Typing%20Test`, {
           method: 'GET',

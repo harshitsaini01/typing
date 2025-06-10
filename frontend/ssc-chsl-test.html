@@ -747,9 +747,16 @@
     }
     async function fetchPassages() {
       try {
-        const response = await fetch('http://localhost:5000/api/passages/test/SSC%20CHSL', {
+        const apiUrl = window.location.hostname === 'localhost' 
+          ? 'http://localhost:6000/api'
+          : 'https://typinghub.in/api';
+        
+        const response = await fetch(`${apiUrl}/passages/test/SSC%20CHSL`, {
           method: 'GET',
-          headers: { 'Content-Type': 'application/json' }
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include'
         });
         if (!response.ok) throw new Error(`Failed to fetch passages: ${response.status}`);
         passages = await response.json();

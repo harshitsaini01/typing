@@ -1375,29 +1375,30 @@
       feedbackContainer.classList.add('show');
     }
 
-    function submitTest() {
-      clearInterval(timerInterval);
-      isRunning = false;
-      typingArea.disabled = true;
-      startButton.disabled = false;
-      pauseButton.disabled = true;
-      restartButton.disabled = false;
-      submitButton.disabled = true;
-      backToSettingsButton.disabled = false;
-      pauseButton.textContent = 'Pause';
-      calculateResults();
-      generateFeedback();
-      currentWordIndex = 0;
-      currentLine = 0;
-      typedWords = [];
-      totalChars = 0;
-      correctChars = 0;
-      mistakes = 0;
-      correctWordsCount = 0;
-      incorrectWordsCount = 0;
-      sampleTextContainer.scrollTop = 0;
-      displayPassage();
-      typingArea.value = '';
+    async function submitTest() {
+      try {
+        const apiUrl = window.location.hostname === 'localhost' 
+          ? 'http://localhost:6000/api'
+          : 'https://typinghub.in/api';
+        
+        const response = await fetch(`${apiUrl}/passages/test/Create%20Test`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            // your test data here
+          })
+        });
+        if (!response.ok) throw new Error(`Failed to submit test: ${response.status}`);
+        const result = await response.json();
+        console.log('Test submitted successfully:', result);
+        // Handle the result as needed
+      } catch (error) {
+        console.error('Error submitting test:', error.message);
+        // Handle the error appropriately
+      }
     }
 
     function startTimer() {

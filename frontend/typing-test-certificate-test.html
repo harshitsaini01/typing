@@ -819,9 +819,16 @@
 
     async function fetchPassages() {
       try {
-        const response = await fetch('http://localhost:5000/api/passages/test/Certificate%20Test', {
+        const apiUrl = window.location.hostname === 'localhost' 
+          ? 'http://localhost:6000/api'
+          : 'https://typinghub.in/api';
+        
+        const response = await fetch(`${apiUrl}/passages/test/Certificate%20Test`, {
           method: 'GET',
-          headers: { 'Content-Type': 'application/json' }
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include'
         });
         if (!response.ok) throw new Error(`Failed to fetch passages: ${response.status}`);
         passages = await response.json();
@@ -1284,7 +1291,7 @@
     });
 
     typingArea.addEventListener('cut', (e) => e.preventDefault());
-    typingArea.addEventListener('copy', (e) => e.preventDefault());
+    typingArea.addEventListener('copy', (e.preventDefault()));
 
     sampleText.addEventListener('copy', (e) => {
       e.preventDefault();

@@ -1,0 +1,2377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - TypingHub.in</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Serif:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Times New Roman', 'Roboto Serif', serif;
+    }
+    body {
+      background: linear-gradient(135deg, #1976d2, #40c4ff);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+    nav {
+      background: #fff;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .nav-brand img {
+      width: 40px;
+      height: auto;
+    }
+    .nav-brand a {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #1976d2;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+    .nav-brand a:hover {
+      color: #ff9800;
+    }
+    .nav-links {
+      display: flex;
+      gap: 1rem;
+      list-style: none;
+      align-items: center;
+    }
+    .nav-links a, .nav-links .dropbtn {
+      color: #333;
+      text-decoration: none;
+      font-size: 1rem;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    .nav-links a:hover, .nav-links .dropbtn:hover {
+      background: #ff9800;
+      color: #fff;
+    }
+    .nav-links a.active {
+      background: #1976d2;
+      color: #fff;
+    }
+    .dropdown {
+      position: relative;
+    }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background: #fff;
+      min-width: 180px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      border-radius: 5px;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1;
+      padding: 0.5rem 0;
+    }
+    .dropdown-content a {
+      color: #333;
+      padding: 0.5rem;
+      text-decoration: none;
+      display: block;
+      text-align: center;
+    }
+    .dropdown-content a:hover {
+      background: #ff9800;
+      color: #fff;
+    }
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+    .hamburger {
+      display: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #333;
+      background: none;
+      border: none;
+    }
+    .auth-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: calc(100vh - 60px);
+      padding: 2rem;
+      text-align: center;
+    }
+    .auth-logo {
+      width: 100px;
+      margin-bottom: 1rem;
+    }
+    .auth-tagline {
+      color: #fff;
+      font-size: 1.5rem;
+      font-weight: 500;
+      margin-bottom: 2rem;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    .auth-container {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+      width: 100%;
+      max-width: 450px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .auth-container:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    }
+    .auth-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background: linear-gradient(to right, #ff9800, #1976d2);
+    }
+    .auth-container h2 {
+      margin-bottom: 1.5rem;
+      color: #1976d2;
+      font-size: 1.8rem;
+      font-weight: 600;
+    }
+    .auth-container label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-align: left;
+      margin: 0.8rem 0 0.3rem;
+      font-size: 0.9rem;
+      color: #333;
+      font-weight: 500;
+    }
+    .auth-container label i {
+      color: #ff9800;
+    }
+    .auth-container input {
+      width: 100%;
+      padding: 0.8rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .auth-container input:focus {
+      border-color: #1976d2;
+      box-shadow: 0 0 5px rgba(25,118,210,0.3);
+      outline: none;
+    }
+    .password-container {
+      position: relative;
+    }
+    .password-container i {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #666;
+      transition: color 0.3s ease;
+    }
+    .password-container i:hover {
+      color: #ff9800;
+    }
+    .auth-container button {
+      width: 100%;
+      padding: 0.8rem;
+      background: linear-gradient(to right, #ff9800, #ffb300);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: background 0.3s ease, transform 0.3s ease;
+    }
+    .auth-container button:hover {
+      background: linear-gradient(to right, #ffb300, #ff9800);
+      transform: translateY(-2px);
+    }
+    .error-message {
+      color: #e63946;
+      margin-top: 0.5rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+    .motivational-message {
+      max-width: 600px;
+      margin: 1rem auto;
+      padding: 1rem;
+      background: linear-gradient(to right, #1976d2, #40c4ff);
+      color: #fff;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: 500;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      transition: transform 0.3s ease;
+    }
+    .motivational-message:hover {
+      transform: translateY(-3px);
+    }
+    .motivational-message.secondary {
+      background: linear-gradient(to right, #ff9800, #ffb300);
+    }
+    .container {
+      display: none;
+      flex: 1;
+      flex-direction: row;
+      background: #f4f7fa;
+      min-height: calc(100vh - 60px);
+      padding: 1rem;
+      gap: 1.5rem;
+    }
+    .sidebar {
+      width: 280px;
+      background: linear-gradient(135deg, #1976d2, #1565c0);
+      color: #fff;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      border-radius: 16px;
+      box-shadow: 0 8px 16px rgba(25, 118, 210, 0.15);
+      height: fit-content;
+      position: sticky;
+      top: 1rem;
+    }
+    .sidebar a, .sidebar button {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #fff;
+      text-decoration: none;
+      font-size: 1rem;
+      padding: 1rem;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+    .sidebar a:hover, .sidebar button:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateX(5px);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+    .sidebar a i, .sidebar button i {
+      font-size: 1.2rem;
+      width: 24px;
+      text-align: center;
+    }
+    .content {
+      flex: 1;
+      padding: 2rem;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+    .content h2 {
+      color: #1976d2;
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: relative;
+      padding-bottom: 1rem;
+    }
+    .content h2::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 60px;
+      height: 4px;
+      background: #1976d2;
+      border-radius: 2px;
+    }
+    /* Welcome Section */
+    #welcome-section p {
+      font-size: 1.1rem;
+      line-height: 1.8;
+      color: #555;
+      background: #f8f9fa;
+      padding: 2rem;
+      border-radius: 12px;
+      border: 1px solid #e0e0e0;
+      margin-top: 1.5rem;
+    }
+    /* Add Passage Section */
+    #add-passage-section label {
+      display: block;
+      color: #333;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      font-size: 1.1rem;
+    }
+    #add-passage-section input[type="text"],
+    #add-passage-section textarea {
+      width: 100%;
+      padding: 1rem;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      margin-bottom: 1.5rem;
+      background: #f8f9fa;
+    }
+    #add-passage-section input[type="text"]:focus,
+    #add-passage-section textarea:focus {
+      border-color: #1976d2;
+      background: #fff;
+      box-shadow: 0 4px 8px rgba(25, 118, 210, 0.1);
+      outline: none;
+    }
+    #add-passage-section textarea {
+      min-height: 200px;
+      resize: vertical;
+    }
+    #add-passage-section button {
+      background: linear-gradient(135deg, #1976d2, #1565c0);
+      color: #fff;
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    #add-passage-section button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(25, 118, 210, 0.2);
+    }
+    /* View Passages Section */
+    #passage-search {
+      width: 100%;
+      padding: 1rem;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
+      background: #f8f9fa;
+      transition: all 0.3s ease;
+    }
+    #passage-search:focus {
+      border-color: #1976d2;
+      background: #fff;
+      box-shadow: 0 4px 8px rgba(25, 118, 210, 0.1);
+      outline: none;
+    }
+    .content-passage-item {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 1.2rem;
+      margin-bottom: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid #e0e0e0;
+      transition: all 0.3s ease;
+    }
+    .content-passage-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      border-color: #1976d2;
+      background: #fff;
+    }
+    .content-passage-item span {
+      font-size: 1.1rem;
+      color: #333;
+      font-weight: 500;
+    }
+    .content-passage-item .button-group {
+      display: flex;
+      gap: 8px;
+    }
+    .content-passage-item button {
+      padding: 0.8rem 1.2rem;
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .content-passage-item button.edit {
+      background: #1976d2;
+    }
+    .content-passage-item button.delete {
+      background: #e63946;
+    }
+    .content-passage-item button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+    .content-passage-item button.edit:hover {
+      background: #1565c0;
+    }
+    .content-passage-item button.delete:hover {
+      background: #d32f2f;
+    }
+    /* Assign Passage Section */
+    #assign-passage-section select {
+      width: 100%;
+      padding: 1rem;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
+      background: #f8f9fa;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    #assign-passage-section select:focus {
+      border-color: #1976d2;
+      background: #fff;
+      box-shadow: 0 4px 8px rgba(25, 118, 210, 0.1);
+      outline: none;
+    }
+    .checkbox-group {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+      padding: 1.5rem;
+      background: #f8f9fa;
+      border-radius: 12px;
+      border: 1px solid #e0e0e0;
+    }
+    .checkbox-group label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0.8rem;
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid #e0e0e0;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .checkbox-group label:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border-color: #1976d2;
+    }
+    .checkbox-group input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      border: 2px solid #1976d2;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    /* Pagination */
+    .pagination {
+      margin-top: 2rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
+    }
+    .pagination button {
+      padding: 0.8rem 1.5rem;
+      background: #1976d2;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+    .pagination button:hover:not(:disabled) {
+      background: #1565c0;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(25, 118, 210, 0.2);
+    }
+    .pagination button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    .pagination span {
+      font-size: 1.1rem;
+      color: #333;
+      font-weight: 500;
+    }
+    /* Error Messages */
+    .error-message {
+      color: #e63946;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .error-message:not(:empty)::before {
+      content: '\f071';
+      font-family: 'Font Awesome 5 Free';
+      font-weight: 900;
+    }
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+      .container {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        position: static;
+        margin-bottom: 1rem;
+      }
+      .content {
+        margin: 0;
+      }
+    }
+    @media (max-width: 768px) {
+      .content {
+        padding: 1.5rem;
+      }
+      .content h2 {
+        font-size: 1.5rem;
+      }
+      .content-passage-item {
+        flex-direction: column;
+        gap: 1rem;
+      }
+      .content-passage-item .button-group {
+        width: 100%;
+      }
+      .content-passage-item button {
+        flex: 1;
+        justify-content: center;
+      }
+      .checkbox-group {
+        grid-template-columns: 1fr;
+      }
+    }
+    .off-canvas-sidebar {
+      position: fixed;
+      top: 0;
+      right: -300px;
+      width: 300px;
+      height: 100%;
+      background: linear-gradient(to bottom, #1976d2, #1565c0);
+      color: #fff;
+      padding: 1.5rem;
+      z-index: 1001;
+      transition: right 0.3s ease;
+      box-shadow: -2px 0 10px rgba(0,0,0,0.2);
+      overflow-y: auto;
+    }
+    .off-canvas-sidebar.open {
+      right: 0;
+    }
+    .off-canvas-sidebar .close-btn {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 1.5rem;
+      cursor: pointer;
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+    }
+    .off-canvas-sidebar .close-btn:hover {
+      color: #ff9800;
+    }
+    .off-canvas-sidebar h3 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .off-canvas-sidebar ul {
+      list-style: none;
+    }
+    .exam-section {
+      margin-bottom: 0.5rem;
+    }
+    .exam-button {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.8rem;
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 1rem;
+      cursor: pointer;
+      width: 100%;
+      text-align: left;
+      border-radius: 6px;
+      transition: background 0.3s ease;
+    }
+    .exam-button:hover {
+      background: #ff9800;
+    }
+    .exam-button i {
+      transition: transform 0.3s ease;
+    }
+    .exam-button.active i {
+      transform: rotate(180deg);
+    }
+    .passage-list {
+      display: none;
+      padding: 0.5rem;
+      background: rgba(255,255,255,0.1);
+      border-radius: 6px;
+      margin-top: 0.3rem;
+    }
+    .passage-list.active {
+      display: block;
+    }
+    .passage-item {
+      background: #fff;
+      border-radius: 8px;
+      padding: 0.8rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #333;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .passage-item b {
+      font-size: 0.9rem;
+    }
+    .passage-item button {
+      padding: 0.4rem 0.8rem;
+      background: #e63946;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.8rem;
+    }
+    .passage-item button:hover {
+      background: #d32f2f;
+    }
+    .no-passages {
+      color: #fff;
+      font-size: 0.9rem;
+      text-align: center;
+      padding: 0.5rem;
+    }
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      display: none;
+    }
+    .overlay.active {
+      display: block;
+    }
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #ff9800;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      animation: spin 1s linear infinite;
+      margin: 0.5rem auto;
+      display: none;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .pagination {
+      margin-top: 1.5rem;
+      text-align: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .pagination button {
+      padding: 0.5rem 1rem;
+      background: #1976d2;
+      color: #fff;
+      border-radius: 6px;
+    }
+    .pagination button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    .pagination span {
+      font-size: 1rem;
+      color: #333;
+    }
+    .hidden {
+      display: none;
+    }
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 60px;
+        left: 0;
+        width: 100%;
+        background: #fff;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        padding: 1rem 0;
+      }
+      .nav-links.active {
+        display: flex;
+      }
+      .nav-links a, .nav-links .dropbtn {
+        padding: 0.8rem;
+        font-size: 1rem;
+      }
+      .dropdown-content {
+        position: static;
+        transform: none;
+        background: #f5f5f5;
+        box-shadow: none;
+      }
+      .hamburger {
+        display: block;
+      }
+      .container {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+        padding: 1rem;
+        gap: 0.3rem;
+      }
+      .sidebar a, .sidebar button {
+        flex: 1;
+        font-size: 0.9rem;
+        padding: 0.6rem;
+        justify-content: center;
+      }
+      .content {
+        margin: 0.5rem;
+        padding: 1.5rem;
+      }
+      .content h2 {
+        font-size: 1.5rem;
+      }
+      .content p {
+        font-size: 1rem;
+      }
+      .content-passage-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+      }
+      .content-passage-item button {
+        width: 100%;
+        margin-left: 0;
+      }
+      .auth-container {
+        max-width: 90%;
+        padding: 1.5rem;
+      }
+      .auth-tagline {
+        font-size: 1.2rem;
+      }
+      .motivational-message {
+        font-size: 0.9rem;
+        padding: 0.8rem;
+      }
+      .off-canvas-sidebar {
+        width: 250px;
+      }
+    }
+    @media (max-width: 480px) {
+      .nav-brand a {
+        font-size: 1.2rem;
+      }
+      .nav-brand img {
+        width: 30px;
+      }
+      .auth-logo {
+        width: 80px;
+      }
+      .auth-tagline {
+        font-size: 1rem;
+      }
+      .auth-container h2 {
+        font-size: 1.5rem;
+      }
+      .content textarea, .content button, .content select {
+        font-size: 0.9rem;
+      }
+      .checkbox-group {
+        flex-direction: column;
+      }
+      .passage-item b, .passage-item button {
+        font-size: 0.8rem;
+      }
+      .off-canvas-sidebar {
+        width: 200px;
+      }
+    }
+    /* Add new modal styles */
+    .assigned-passages-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(25, 118, 210, 0.2);
+      backdrop-filter: blur(5px);
+      z-index: 1003;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .assigned-passages-modal.show {
+      display: flex;
+      opacity: 1;
+    }
+    .assigned-passages-content {
+      background: #fff;
+      padding: 2.5rem;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 800px;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+      transform: scale(0.8);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      border: 1px solid rgba(25, 118, 210, 0.1);
+    }
+    .assigned-passages-content.show {
+      transform: scale(1);
+    }
+    .assigned-passages-content::-webkit-scrollbar {
+      width: 8px;
+    }
+    .assigned-passages-content::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 4px;
+    }
+    .assigned-passages-content::-webkit-scrollbar-thumb {
+      background: #1976d2;
+      border-radius: 4px;
+    }
+    .assigned-passages-content::-webkit-scrollbar-thumb:hover {
+      background: #1565c0;
+    }
+    .assigned-passages-content h2 {
+      color: #1976d2;
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      padding-right: 40px;
+      font-weight: 600;
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .assigned-passages-content h2::before {
+      content: '';
+      width: 4px;
+      height: 24px;
+      background: #1976d2;
+      border-radius: 2px;
+      margin-right: 8px;
+    }
+    .assigned-passages-list {
+      margin-top: 1.5rem;
+      display: grid;
+      gap: 12px;
+    }
+    .assigned-passage-item {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 1.2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.3s ease;
+      border: 1px solid #e0e0e0;
+    }
+    .assigned-passage-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      background: #fff;
+      border-color: #1976d2;
+    }
+    .assigned-passage-item span {
+      font-size: 1.1rem;
+      color: #333;
+      font-weight: 500;
+      flex: 1;
+      margin-right: 1rem;
+    }
+    .assigned-passage-item button {
+      padding: 0.6rem 1.2rem;
+      background: #e63946;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .assigned-passage-item button i {
+      font-size: 0.9rem;
+    }
+    .assigned-passage-item button:hover {
+      background: #d32f2f;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(230, 57, 70, 0.2);
+    }
+    .close-modal-btn {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      background: #f8f9fa;
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      color: #333;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .close-modal-btn:hover {
+      background: #e63946;
+      color: #fff;
+      transform: rotate(90deg);
+    }
+    .no-assigned-passages {
+      text-align: center;
+      padding: 3rem 2rem;
+      color: #666;
+      font-style: italic;
+      background: #f8f9fa;
+      border-radius: 12px;
+      border: 1px dashed #ccc;
+      margin-top: 1rem;
+    }
+    .no-assigned-passages i {
+      font-size: 2.5rem;
+      color: #1976d2;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+    .modal-header-info {
+      color: #666;
+      font-size: 0.9rem;
+      margin-top: -1rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .modal-header-info i {
+      color: #1976d2;
+    }
+    .spinner-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 200px;
+    }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #1976d2;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    @media (max-width: 768px) {
+      .assigned-passages-content {
+        padding: 1.5rem;
+        max-height: 90vh;
+      }
+      .assigned-passages-content h2 {
+        font-size: 1.5rem;
+      }
+      .assigned-passage-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+      .assigned-passage-item button {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+    /* Edit Modal Styles */
+    .edit-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1002;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .edit-modal.show {
+      display: flex;
+    }
+
+    .edit-modal-content {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 600px;
+      position: relative;
+      transform: scale(0.8);
+      transition: transform 0.3s ease;
+    }
+
+    .edit-modal.show .edit-modal-content {
+      transform: scale(1);
+    }
+
+    .edit-modal h2 {
+      color: #1976d2;
+      font-size: 1.8rem;
+      margin-bottom: 1.5rem;
+      padding-right: 40px;
+    }
+
+    .edit-modal label {
+      display: block;
+      color: #333;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+
+    .edit-modal input,
+    .edit-modal textarea {
+      width: 100%;
+      padding: 1rem;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      font-size: 1rem;
+    }
+
+    .edit-modal textarea {
+      min-height: 200px;
+      resize: vertical;
+    }
+
+    .edit-modal .button-group {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .edit-modal button {
+      padding: 0.8rem 2rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .edit-modal button.save {
+      background: #1976d2;
+      color: #fff;
+      flex: 2;
+    }
+
+    .edit-modal button.cancel {
+      background: #e0e0e0;
+      color: #333;
+      flex: 1;
+    }
+
+    .edit-modal button:hover {
+      transform: translateY(-2px);
+    }
+
+    .edit-modal button.save:hover {
+      background: #1565c0;
+    }
+
+    .edit-modal button.cancel:hover {
+      background: #ccc;
+    }
+
+    .edit-modal .close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: #666;
+      cursor: pointer;
+      padding: 0.5rem;
+      transition: color 0.3s ease;
+    }
+
+    .edit-modal .close:hover {
+      color: #e63946;
+    }
+  </style>
+</head>
+<body>
+  <div id="header"></div>
+
+  <div class="auth-section" id="login-section">
+    <img src="Main LOGO.png" alt="TypingHub Logo" class="auth-logo">
+    <h1 class="auth-tagline">Manage TypingHub with Ease!</h1>
+    <div class="auth-container" id="login-container">
+      <h2>Login</h2>
+      <label for="username"><i class="fas fa-envelope"></i> Username (Email):</label>
+      <input type="text" id="username" placeholder="Enter Email">
+      <div class="error-message" id="username-error"></div>
+      <label for="password"><i class="fas fa-lock"></i> Password:</label>
+      <div class="password-container">
+        <input type="password" id="password" placeholder="Enter Password">
+        <i class="fas fa-eye" id="eye-icon"></i>
+      </div>
+      <div class="error-message" id="password-error"></div>
+      <button onclick="login()">Login</button>
+      <div class="spinner" id="login-spinner"></div>
+      <div class="error-message" id="error-message"></div>
+    </div>
+
+    <div class="motivational-message">
+      "Unlock your typing potential! Practice daily with TypingHub to ace your government exams and land your dream job! 🚀"
+    </div>
+    <div class="motivational-message secondary">
+      "Every keystroke counts! Keep typing, stay focused, and watch your speed soar! 💻"
+    </div>
+    <div class="motivational-message">
+      "Consistency is key! Type faster, type smarter, and get ready to shine in your exams! 🌟"
+    </div>
+  </div>
+
+  <div class="overlay" id="overlay"></div>
+  <div class="assigned-passages-modal" id="assigned-passages-modal">
+    <div class="assigned-passages-content">
+      <button class="close-modal-btn" onclick="closeAssignedPassagesModal()">
+        <i class="fas fa-times"></i>
+      </button>
+      <h2 id="assigned-passages-title">Assigned Passages</h2>
+      <div class="assigned-passages-list" id="assigned-passages-list"></div>
+    </div>
+  </div>
+
+  <aside class="off-canvas-sidebar" id="off-canvas-sidebar">
+    <button class="close-btn" id="close-sidebar" aria-label="Close sidebar">
+      <i class="fas fa-times"></i>
+    </button>
+    <h3>Test Categories</h3>
+    <ul>
+      <li class="exam-section">
+        <button class="exam-button" onclick="showAssignedPassages('SSC CGL')">
+          SSC CGL <i class="fas fa-external-link-alt"></i>
+        </button>
+      </li>
+      <li class="exam-section">
+        <button class="exam-button" onclick="showAssignedPassages('SSC CHSL')">
+          SSC CHSL <i class="fas fa-external-link-alt"></i>
+        </button>
+      </li>
+      <li class="exam-section">
+        <button class="exam-button" onclick="showAssignedPassages('RRB NTPC')">
+          RRB NTPC <i class="fas fa-external-link-alt"></i>
+        </button>
+      </li>
+      <li class="exam-section">
+        <button class="exam-button" onclick="showAssignedPassages('Junior Assistant')">
+          Junior Assistant <i class="fas fa-external-link-alt"></i>
+        </button>
+      </li>
+      <li class="exam-section">
+        <button class="exam-button" onclick="showAssignedPassages('Superintendent')">
+          Superintendent <i class="fas fa-external-link-alt"></i>
+        </button>
+      </li>
+      <li class="exam-section">
+        <button class="exam-button" onclick="showAssignedPassages('Junior Court Assistant')">
+          Junior Court Assistant <i class="fas fa-external-link-alt"></i>
+        </button>
+      </li>
+      <li class="exam-section">
+        <button class="exam-button" onclick="showAssignedPassages('Certificate Test')">
+          Certificate Test <i class="fas fa-external-link-alt"></i>
+        </button>
+      </li>
+      <li class="exam-section">
+        <button class="exam-button" onclick="showAssignedPassages('Create Test')">
+          Create Test <i class="fas fa-external-link-alt"></i>
+        </button>
+      </li>
+      <li class="exam-section">
+        <button class="exam-button" onclick="showAssignedPassages('Typing Test')">
+          Typing Test <i class="fas fa-external-link-alt"></i>
+        </button>
+      </li>
+    </ul>
+  </aside>
+
+  <div class="edit-modal" id="edit-passage-modal">
+    <div class="edit-modal-content">
+      <button class="close" onclick="closeEditPassageModal()">
+        <i class="fas fa-times"></i>
+      </button>
+      <h2>Edit Passage</h2>
+      <label for="edit-passage-title">Passage Title:</label>
+      <input type="text" id="edit-passage-title" placeholder="Enter passage title">
+      <div class="error-message" id="edit-passage-title-error"></div>
+      
+      <label for="edit-passage-content">Passage Content:</label>
+      <textarea id="edit-passage-content" placeholder="Enter passage content"></textarea>
+      <div class="error-message" id="edit-passage-content-error"></div>
+      
+      <div class="button-group">
+        <button class="save" onclick="saveEditedPassage()">Save Changes</button>
+        <button class="cancel" onclick="closeEditPassageModal()">Cancel</button>
+      </div>
+      <div class="spinner" id="edit-passage-spinner"></div>
+    </div>
+  </div>
+
+  <div class="container" id="dashboard-container">
+    <div class="sidebar">
+      <a href="#" id="welcome-link"><i class="fas fa-home"></i> Welcome</a>
+      <a href="#" id="add-passage-link"><i class="fas fa-plus"></i> Add New Passage</a>
+      <a href="#" id="view-passages-link"><i class="fas fa-list"></i> View & Manage Passages</a>
+      <a href="#" id="assign-passage-link"><i class="fas fa-link"></i> Assign Passage to Tests</a>
+      <button id="assigned-passage-btn-sidebar"><i class="fas fa-tasks"></i> Assigned Passages</button>
+      <button id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </div>
+    <div class="content">
+      <div id="welcome-section">
+        <h2>Hello, Admin! 🌟 Let's Shape the Future of TypingHub! 🚀</h2>
+        <p>Welcome to your Admin Dashboard, the heart of TypingHub! You're the driving force behind helping thousands of users achieve their typing dreams and excel in their government exams. From creating engaging passages to assigning them to various tests, your role is pivotal in ensuring our users get the best practice experience. Let's make learning fun, interactive, and impactful! Whether it's crafting new passages, managing existing ones, or assigning them to tests, every action you take here empowers users to type faster, smarter, and with confidence. Together, we can help them ace exams like SSC, RRB, and CPCT, and secure their dream jobs. So, let's dive in with full energy, create amazing content, and inspire our users to reach new heights in their typing journey! Ready to make a difference today? Let's get started! 💻✨</p>
+      </div>
+      <div id="add-passage-section" class="hidden">
+        <h2>Add New Passage</h2>
+        <label for="passage-name">Passage Name:</label>
+        <input type="text" id="passage-name" placeholder="Enter passage name...">
+        <div class="error-message" id="passage-name-error"></div>
+        <label for="new-passage">Passage Content:</label>
+        <textarea id="new-passage" placeholder="Enter new passage..."></textarea>
+        <div class="error-message" id="passage-content-error"></div>
+        <button onclick="addPassage()">Submit</button>
+        <div class="spinner" id="add-passage-spinner"></div>
+      </div>
+      <div id="view-passages-section" class="hidden">
+        <h2>View & Manage Passages</h2>
+        <input type="text" id="passage-search" placeholder="Search passages..." oninput="filterPassages()">
+        <div class="content-passage-list" id="passage-list"></div>
+        <div class="pagination">
+          <button onclick="changePage(-1)" id="prev-page" disabled>Previous</button>
+          <span id="page-info">Page 1</span>
+          <button onclick="changePage(1)" id="next-page">Next</button>
+        </div>
+        <div class="spinner" id="view-passages-spinner"></div>
+      </div>
+      <div id="assign-passage-section" class="hidden">
+        <h2>Assign Passage to Tests</h2>
+        <div class="assign-section">
+          <label for="passage-select">Select Passage:</label>
+          <select id="passage-select">
+            <option value="">Select a passage</option>
+          </select>
+          <div class="error-message" id="passage-select-error"></div>
+          <div class="checkbox-group">
+            <label><input type="checkbox" value="Create Test"> Create Test</label>
+            <label><input type="checkbox" value="Typing Test"> Typing Test</label>
+            <label><input type="checkbox" value="SSC CGL"> SSC CGL</label>
+            <label><input type="checkbox" value="SSC CHSL"> SSC CHSL</label>
+            <label><input type="checkbox" value="RRB NTPC"> RRB NTPC</label>
+            <label><input type="checkbox" value="Junior Assistant"> Junior Assistant</label>
+            <label><input type="checkbox" value="Superintendent"> Superintendent</label>
+            <label><input type="checkbox" value="Junior Court Assistant"> Junior Court Assistant</label>
+            <label><input type="checkbox" value="Certificate Test"> Certificate Test</label>
+          </div>
+          <div class="error-message" id="test-type-error"></div>
+          <button onclick="assignPassage()">Assign</button>
+          <div class="spinner" id="assign-passage-spinner"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="footer"></div>
+
+  <script type="text/javascript">
+    // XLSX File Processing
+    var gk_isXlsx = false;
+    var gk_xlsxFileLookup = {};
+    var gk_fileData = {};
+    function filledCell(cell) {
+      return cell !== '' && cell != null;
+    }
+    function loadFileData(filename) {
+      if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+        try {
+          var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+          var firstSheetName = workbook.SheetNames[0];
+          var worksheet = workbook.Sheets[firstSheetName];
+          var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+          var filteredData = jsonData.filter(row => row.some(filledCell));
+          var headerRowIndex = filteredData.findIndex((row, index) =>
+            row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+          );
+          if (headerRowIndex === -1 || headerRowIndex > 25) {
+            headerRowIndex = 0;
+          }
+          var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex));
+          csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+          return csv;
+        } catch (e) {
+          console.error(e);
+          return "";
+        }
+      }
+      return gk_fileData[filename] || "";
+    }
+  </script>
+
+  <script>
+    // Header and Footer fetch
+    function loadHeaderAndFooter() {
+      fetch('header.html')
+        .then(response => {
+          console.log('Fetching header.html... Status:', response.status);
+          if (!response.ok) throw new Error('Failed to load header: ' + response.status);
+          return response.text();
+        })
+        .then(data => {
+          console.log('Header loaded successfully');
+          document.getElementById('header').innerHTML = data;
+          initializeNavigation();
+          initializeHamburger();
+        })
+        .catch(error => {
+          console.error('Error loading header:', error);
+          document.getElementById('header').innerHTML = `<p style="color: #e63946; text-align: center; padding: 1rem;">Error loading header. Please try again later.</p>`;
+          initializeNavigation();
+          initializeHamburger();
+        });
+
+      fetch('footer.html')
+        .then(response => {
+          console.log('Fetching footer.html... Status:', response.status);
+          if (!response.ok) throw new Error('Failed to load footer: ' + response.status);
+          return response.text();
+        })
+        .then(data => {
+          console.log('Footer loaded successfully');
+          document.getElementById('footer').innerHTML = data;
+        })
+        .catch(error => {
+          console.error('Error loading footer:', error);
+          document.getElementById('footer').innerHTML = `<p style="color: #e63946; text-align: center; padding: 1rem;">Error loading footer. Please try again later.</p>`;
+        });
+    }
+
+    function initializeNavigation() {
+      const navLinks = document.querySelectorAll('.nav-links a');
+      navLinks.forEach(link => {
+        if (link.getAttribute('href') === window.location.pathname.split('/').pop()) {
+          link.classList.add('active');
+        } else {
+          link.classList.remove('active');
+        }
+      });
+    }
+
+    function initializeHamburger() {
+      const hamburger = document.querySelector('.hamburger');
+      const navLinks = document.querySelector('.nav-links');
+      if (hamburger && navLinks) {
+        hamburger.addEventListener('click', () => {
+          navLinks.classList.toggle('active');
+        });
+      }
+    }
+
+    // Global Variables
+    let passages = [];
+    let currentEditId = null;
+    let currentPage = 1;
+    const passagesPerPage = 10;
+    const API_BASE_URL = 'http://localhost:5000/api';
+    const exams = [
+      'SSC CGL',
+      'SSC CHSL',
+      'RRB NTPC',
+      'Junior Assistant',
+      'Superintendent',
+      'Junior Court Assistant',
+      'Certificate Test',
+      'Create Test',
+      'Typing Test'
+    ];
+
+    // DOM Elements
+    const loginContainer = document.getElementById('login-container');
+    const dashboardContainer = document.getElementById('dashboard-container');
+    const errorMessage = document.getElementById('error-message');
+    const welcomeSection = document.getElementById('welcome-section');
+    const addPassageSection = document.getElementById('add-passage-section');
+    const viewPassagesSection = document.getElementById('view-passages-section');
+    const assignPassageSection = document.getElementById('assign-passage-section');
+    const passageList = document.getElementById('passage-list');
+    const passageSelect = document.getElementById('passage-select');
+    const eyeIcon = document.getElementById('eye-icon');
+    const editPassageModal = document.getElementById('edit-passage-modal');
+    const editPassageTitle = document.getElementById('edit-passage-title');
+    const editPassageContent = document.getElementById('edit-passage-content');
+    const welcomeLink = document.getElementById('welcome-link');
+    const addPassageLink = document.getElementById('add-passage-link');
+    const viewPassagesLink = document.getElementById('view-passages-link');
+    const assignPassageLink = document.getElementById('assign-passage-link');
+    const assignedPassageBtnSidebar = document.getElementById('assigned-passage-btn-sidebar');
+    const logoutBtn = document.getElementById('logout-btn');
+    const offCanvasSidebar = document.getElementById('off-canvas-sidebar');
+    const closeSidebarBtn = document.getElementById('close-sidebar');
+    const overlay = document.getElementById('overlay');
+
+    // Utility Functions
+    function sanitizeInput(input) {
+      const div = document.createElement('div');
+      div.textContent = input;
+      return div.innerHTML;
+    }
+
+    function validateEmail(email) {
+      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return re.test(email);
+    }
+
+    function showError(element, message) {
+      if (element) {
+        element.innerHTML = `<p class="no-passages">${message}</p>`;
+      } else {
+        console.warn(`Cannot show error: Element is null for message: ${message}`);
+      }
+    }
+
+    function debounce(func, delay) {
+      let timeoutId;
+      return function (...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => func.apply(this, args), delay);
+      };
+    }
+
+    // Off-Canvas Sidebar Toggle
+    function toggleSidebar() {
+      offCanvasSidebar.classList.toggle('open');
+      overlay.classList.toggle('active');
+      if (offCanvasSidebar.classList.contains('open')) {
+        fetchAllAssignedPassages();
+      }
+    }
+
+    assignedPassageBtnSidebar.addEventListener('click', toggleSidebar);
+    closeSidebarBtn.addEventListener('click', toggleSidebar);
+    overlay.addEventListener('click', toggleSidebar);
+
+    // Handle Escape Key for Sidebar and Modal
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      if (editPassageModal.classList.contains('show')) {
+        closeEditPassageModal();
+      } else if (offCanvasSidebar.classList.contains('open')) {
+        toggleSidebar();
+      }
+    });
+
+    // Toggle Passages for Each Exam
+    function togglePassages(testType) {
+      const passageList = document.getElementById(`passages-${testType.replace(/\s+/g, '-')}`);
+      if (!passageList) {
+        console.warn(`Passage list element not found for test type: ${testType}`);
+        return;
+      }
+      const button = passageList.previousElementSibling;
+      const isActive = passageList.classList.contains('active');
+
+      document.querySelectorAll('.passage-list.active').forEach(list => {
+        if (list !== passageList) {
+          list.classList.remove('active');
+          list.previousElementSibling.classList.remove('active');
+        }
+      });
+
+      passageList.classList.toggle('active');
+      button.classList.toggle('active');
+
+      if (!isActive) {
+        fetchPassagesByTestType(testType);
+      }
+    }
+
+    // Edit Passage Modal Functions
+    function openEditPassageModal(passageId) {
+      if (!passages || passages.length === 0) {
+        alert('No passages available. Please refresh the page and try again.');
+        return;
+      }
+      const passage = passages.find(p => p._id === passageId);
+      if (!passage) {
+        console.error('Passage not found for ID:', passageId);
+        alert('Passage not found. Please refresh the page and try again.');
+        return;
+      }
+      currentEditId = passageId;
+      editPassageTitle.value = passage.title || '';
+      editPassageContent.value = passage.content || '';
+      editPassageModal.classList.add('show');
+      editPassageModal.style.display = 'flex';
+      const editModalContent = editPassageModal.querySelector('.edit-modal-content');
+      editModalContent.classList.add('show');
+      document.getElementById('edit-passage-title-error').textContent = '';
+      document.getElementById('edit-passage-content-error').textContent = '';
+    }
+
+    function closeEditPassageModal() {
+      const editModalContent = editPassageModal.querySelector('.edit-modal-content');
+      editModalContent.classList.remove('show');
+      editPassageModal.classList.remove('show');
+      setTimeout(() => {
+        editPassageModal.style.display = 'none';
+        currentEditId = null;
+        editPassageTitle.value = '';
+        editPassageContent.value = '';
+        document.getElementById('edit-passage-title-error').textContent = '';
+        document.getElementById('edit-passage-content-error').textContent = '';
+      }, 300);
+    }
+
+    editPassageModal.addEventListener('click', (event) => {
+      if (event.target === editPassageModal) {
+        closeEditPassageModal();
+      }
+    });
+
+    // API Calls with Authorization Header
+    async function refreshAccessToken() {
+      try {
+        const response = await fetch(`${API_BASE_URL}/auth/refresh-token`, {
+          method: 'POST',
+          credentials: 'include',
+        });
+        if (!response.ok) {
+          const data = await response.json();
+          throw new Error(data.message || 'Failed to refresh token');
+        }
+        const data = await response.json();
+        if (!data.accessToken || typeof data.accessToken !== 'string') {
+          throw new Error('Invalid access token received during refresh');
+        }
+        console.log('Access token refreshed successfully');
+        localStorage.setItem('accessToken', data.accessToken);
+        return data.accessToken;
+      } catch (error) {
+        console.error('Error refreshing token:', error.message);
+        redirectToLogin('Session expired. Please log in again.');
+        throw error;
+      }
+    }
+
+    // Security and Session Management
+    const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes
+    let sessionTimer;
+    let loginAttempts = 0;
+    const MAX_LOGIN_ATTEMPTS = 5;
+    let lastLoginAttempt = 0;
+    const LOCKOUT_DURATION = 15 * 60 * 1000; // 15 minutes
+
+    function resetLoginAttempts() {
+      loginAttempts = 0;
+      lastLoginAttempt = 0;
+    }
+
+    function startSessionTimer() {
+      clearTimeout(sessionTimer);
+      sessionTimer = setTimeout(() => {
+        alert('Your session has expired. Please login again.');
+        logout();
+      }, SESSION_TIMEOUT);
+    }
+
+    function resetSessionTimer() {
+      startSessionTimer();
+    }
+
+    // Add event listeners for user activity
+    document.addEventListener('mousemove', resetSessionTimer);
+    document.addEventListener('keypress', resetSessionTimer);
+    document.addEventListener('click', resetSessionTimer);
+
+    // Enhanced security checks
+    function isSecureContext() {
+      return window.isSecureContext || window.location.protocol === 'https:' || window.location.hostname === 'localhost';
+    }
+
+    function checkBrowserSecurity() {
+      if (!isSecureContext()) {
+        console.warn('Warning: Application is not running in a secure context');
+      }
+      if (!window.crypto || !window.crypto.subtle) {
+        console.error('Error: Cryptographic features are not available');
+        return false;
+      }
+      return true;
+    }
+
+    async function hashPassword(password) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(password);
+      const hash = await crypto.subtle.digest('SHA-256', data);
+      return Array.from(new Uint8Array(hash))
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
+    }
+
+    // Optimized login process
+    async function login() {
+      const email = sanitizeInput(document.getElementById('username').value.trim());
+      const password = sanitizeInput(document.getElementById('password').value.trim());
+      const emailError = document.getElementById('username-error');
+      const passwordError = document.getElementById('password-error');
+      const spinner = document.getElementById('login-spinner');
+      const loginButton = document.querySelector('#login-container button');
+
+      // Clear previous errors
+      emailError.textContent = '';
+      passwordError.textContent = '';
+      errorMessage.textContent = '';
+
+      // Basic validation
+      if (!email) {
+        emailError.textContent = 'Email is required.';
+        return;
+      }
+      if (!validateEmail(email)) {
+        emailError.textContent = 'Please enter a valid email.';
+        return;
+      }
+      if (!password) {
+        passwordError.textContent = 'Password is required.';
+        return;
+      }
+
+      // Rate limiting check
+      const now = Date.now();
+      if (loginAttempts >= MAX_LOGIN_ATTEMPTS) {
+        const timeRemaining = LOCKOUT_DURATION - (now - lastLoginAttempt);
+        if (timeRemaining > 0) {
+          const minutesRemaining = Math.ceil(timeRemaining / 60000);
+          errorMessage.textContent = `Too many login attempts. Please try again in ${minutesRemaining} minutes.`;
+          return;
+        } else {
+          resetLoginAttempts();
+        }
+      }
+
+      // Visual feedback
+      spinner.style.display = 'block';
+      loginButton.disabled = true;
+      loginButton.textContent = 'Logging in...';
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/auth/login`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({ 
+            email, 
+            password
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          loginAttempts++;
+          lastLoginAttempt = now;
+          throw new Error(data.message || 'Login failed');
+        }
+
+        if (!data.accessToken || typeof data.accessToken !== 'string' || data.accessToken === 'undefined') {
+          throw new Error('Failed to retrieve a valid access token');
+        }
+
+        // Successful login
+        localStorage.setItem('accessToken', data.accessToken);
+        resetLoginAttempts();
+        startSessionTimer();
+        document.getElementById('login-section').style.display = 'none';
+        dashboardContainer.style.display = 'flex';
+        showSection(welcomeSection);
+        await fetchAllPassages();
+        errorMessage.textContent = '';
+
+      } catch (error) {
+        console.error('Login error:', error.message);
+        errorMessage.textContent = error.message;
+        
+        // Update remaining attempts message
+        const remainingAttempts = MAX_LOGIN_ATTEMPTS - loginAttempts;
+        if (remainingAttempts > 0) {
+          errorMessage.textContent += ` (${remainingAttempts} attempts remaining)`;
+        }
+      } finally {
+        spinner.style.display = 'none';
+        loginButton.disabled = false;
+        loginButton.textContent = 'Login';
+      }
+    }
+
+    // Simplified fetchWithAuth
+    async function fetchWithAuth(url, options = {}) {
+      let accessToken = localStorage.getItem('accessToken');
+      if (!accessToken || accessToken === 'undefined' || accessToken === 'null') {
+        redirectToLogin('Please log in to continue.');
+        throw new Error('No valid access token');
+      }
+
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`,
+        ...options.headers,
+      };
+
+      try {
+        const response = await fetch(url, {
+          ...options,
+          headers,
+          credentials: 'include',
+        });
+
+        if (response.status === 401) {
+          clearTimeout(sessionTimer);
+          redirectToLogin('Session expired. Please login again.');
+          throw new Error('Session expired');
+        }
+
+        const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.message || 'Request failed');
+        }
+
+        return { ok: true, data };
+      } catch (error) {
+        if (!navigator.onLine) {
+          throw new Error('Network connection lost. Please check your internet connection.');
+        }
+        throw error;
+      }
+    }
+
+    async function fetchPassagesByTestType(testType) {
+      const passageList = document.getElementById(`passages-${testType.replace(/\s+/g, '-')}`);
+      if (!passageList) {
+        console.warn(`Passage list element not found for test type: ${testType}`);
+        return;
+      }
+      try {
+        const response = await fetchWithAuth(`${API_BASE_URL}/passages/test/${encodeURIComponent(testType)}`);
+        const passages = response.data || [];
+        console.log(`Fetched passages for ${testType}:`, passages);
+        displayPassagesInSidebar(passageList, passages, testType);
+      } catch (error) {
+        console.error(`Error fetching passages for ${testType}:`, error);
+        showError(passageList, `No passages assigned to ${testType}.`);
+      }
+    }
+
+    async function fetchAllAssignedPassages() {
+      exams.forEach(testType => {
+        fetchPassagesByTestType(testType);
+      });
+    }
+
+    async function fetchAllPassages() {
+      const spinner = document.getElementById('view-passages-spinner');
+      spinner.style.display = 'block';
+      passageList.innerHTML = '<p>Loading...</p>';
+      try {
+        const response = await fetchWithAuth(`${API_BASE_URL}/passages`);
+        passages = response.data || [];
+        if (passages.length === 0) {
+          passageList.innerHTML = '<p class="no-passages">No passages available.</p>';
+        } else {
+          displayPassages();
+        }
+        populatePassageSelect();
+      } catch (error) {
+        console.error('Error fetching all passages:', error);
+        showError(passageList, error.message);
+      } finally {
+        spinner.style.display = 'none';
+      }
+    }
+
+    async function saveEditedPassage() {
+      const title = sanitizeInput(editPassageTitle.value.trim());
+      const content = sanitizeInput(editPassageContent.value.trim());
+      const titleError = document.getElementById('edit-passage-title-error');
+      const contentError = document.getElementById('edit-passage-content-error');
+      const spinner = document.getElementById('edit-passage-spinner');
+
+      titleError.textContent = '';
+      contentError.textContent = '';
+
+      if (!title) {
+        titleError.textContent = 'Passage title is required.';
+        return;
+      }
+      if (!content) {
+        contentError.textContent = 'Passage content is required.';
+        return;
+      }
+
+      spinner.style.display = 'block';
+      try {
+        const passage = passages.find(p => p._id === currentEditId);
+        const response = await fetchWithAuth(`${API_BASE_URL}/passages/${currentEditId}`, {
+          method: 'PUT',
+          body: JSON.stringify({
+            title,
+            content,
+            testTypes: passage.testTypes || [],
+          }),
+        });
+        const updatedPassage = response.data;
+        passages = passages.map(p => (p._id === currentEditId ? updatedPassage : p));
+        closeEditPassageModal();
+        displayPassages();
+        populatePassageSelect();
+        fetchAllAssignedPassages();
+        alert('Passage updated successfully!');
+      } catch (error) {
+        console.error('Error updating passage:', error);
+        alert(error.message);
+      } finally {
+        spinner.style.display = 'none';
+      }
+    }
+
+    async function unassignPassageFromTest(passageId, testType) {
+      if (!confirm(`Are you sure you want to unassign this passage from ${testType}? This action cannot be undone.`)) return;
+      try {
+        const passage = passages.find(p => p._id === passageId);
+        if (!passage) throw new Error('Passage not found');
+        const updatedTestTypes = (passage.testTypes || []).filter(t => t !== testType);
+        const response = await fetchWithAuth(`${API_BASE_URL}/passages/${passageId}`, {
+          method: 'PUT',
+          body: JSON.stringify({
+            title: passage.title,
+            content: passage.content,
+            testTypes: updatedTestTypes,
+          }),
+        });
+        passages = passages.map(p => p._id === passageId ? { ...p, testTypes: updatedTestTypes } : p);
+        fetchPassagesByTestType(testType);
+        displayPassages();
+        populatePassageSelect();
+        alert('Passage unassigned successfully!');
+      } catch (error) {
+        console.error('Error unassigning passage:', error);
+        alert(error.message);
+      }
+    }
+
+    function displayPassagesInSidebar(passageList, passages, testType) {
+      if (!passageList) {
+        console.warn(`Passage list element not found for test type: ${testType}`);
+        return;
+      }
+      passageList.innerHTML = passages.length === 0
+        ? '<p class="no-passages">No passages assigned.</p>'
+        : passages.map(p => `
+            <div class="passage-item">
+              <b>${sanitizeInput(p.title)}</b>
+              <button onclick="unassignPassageFromTest('${p._id}', '${testType}')">Delete</button>
+            </div>
+          `).join('');
+    }
+
+    // Authentication Functions
+    async function checkAuth() {
+      const accessToken = localStorage.getItem('accessToken');
+      if (!accessToken || accessToken === 'undefined' || accessToken === 'null') {
+        redirectToLogin();
+        return;
+      }
+      try {
+        const response = await fetchWithAuth(`${API_BASE_URL}/auth/check`);
+        document.getElementById('login-section').style.display = 'none';
+        dashboardContainer.style.display = 'flex';
+        showSection(welcomeSection);
+        await fetchAllPassages();
+      } catch (error) {
+        console.error('Error checking auth:', error.message);
+        redirectToLogin('Please log in to continue.');
+      }
+    }
+
+    function redirectToLogin(message = '') {
+      localStorage.removeItem('accessToken');
+      document.getElementById('login-section').style.display = 'flex';
+      dashboardContainer.style.display = 'none';
+      passages = [];
+      passageList.innerHTML = '';
+      passageSelect.innerHTML = '<option value="">Select a passage</option>';
+      if (message) {
+        errorMessage.textContent = message;
+      }
+    }
+
+    async function logout() {
+      if (!confirm('Are you sure you want to logout?')) return;
+      
+      const spinner = document.getElementById('login-spinner');
+      spinner.style.display = 'block';
+      
+      try {
+        await fetch(`${API_BASE_URL}/auth/logout`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+          }
+        });
+
+        // Clear all session data
+        localStorage.removeItem('accessToken');
+        sessionStorage.clear();
+        clearTimeout(sessionTimer);
+        resetLoginAttempts();
+
+        // Reset UI
+        document.getElementById('login-section').style.display = 'flex';
+        dashboardContainer.style.display = 'none';
+        document.getElementById('username').value = '';
+        document.getElementById('password').value = '';
+        errorMessage.textContent = '';
+        showSection(welcomeSection);
+        passages = [];
+        passageList.innerHTML = '';
+        passageSelect.innerHTML = '<option value="">Select a passage</option>';
+        offCanvasSidebar.classList.remove('open');
+        overlay.classList.remove('active');
+
+        alert('Logged out successfully!');
+      } catch (error) {
+        console.error('Error logging out:', error);
+        alert('Error during logout. Please try again.');
+      } finally {
+        spinner.style.display = 'none';
+      }
+    }
+
+    // Other Functions
+    function showSection(section) {
+      welcomeSection.classList.add('hidden');
+      addPassageSection.classList.add('hidden');
+      viewPassagesSection.classList.add('hidden');
+      assignPassageSection.classList.add('hidden');
+      section.classList.remove('hidden');
+    }
+
+    eyeIcon.addEventListener('click', () => {
+      const passwordField = document.getElementById('password');
+      if (passwordField.type === 'password') {
+        passwordField.type = 'text';
+        eyeIcon.classList.remove('fa-eye');
+        eyeIcon.classList.add('fa-eye-slash');
+      } else {
+        passwordField.type = 'password';
+        eyeIcon.classList.remove('fa-eye-slash');
+        eyeIcon.classList.add('fa-eye');
+      }
+    });
+
+    welcomeLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      showSection(welcomeSection);
+    });
+
+    addPassageLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      showSection(addPassageSection);
+    });
+
+    viewPassagesLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      showSection(viewPassagesSection);
+      fetchAllPassages();
+    });
+
+    assignPassageLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      showSection(assignPassageSection);
+      fetchAllPassages();
+    });
+
+    logoutBtn.addEventListener('click', logout);
+
+    function displayPassages() {
+      const searchTerm = document.getElementById('passage-search').value.toLowerCase();
+      const filteredPassages = passages.filter(p => p.title.toLowerCase().includes(searchTerm));
+      const start = (currentPage - 1) * passagesPerPage;
+      const end = start + passagesPerPage;
+      const paginatedPassages = filteredPassages.slice(start, end);
+
+      passageList.innerHTML = '';
+      if (paginatedPassages.length === 0) {
+        passageList.innerHTML = `
+          <div class="no-assigned-passages">
+            <i class="fas fa-search"></i><br>
+            No passages found matching your search.
+          </div>
+        `;
+        return;
+      }
+
+      paginatedPassages.forEach(passage => {
+        const div = document.createElement('div');
+        div.className = 'content-passage-item';
+        div.innerHTML = `
+          <span>${sanitizeInput(passage.title)}</span>
+          <div class="button-group">
+            <button class="edit" onclick="openEditPassageModal('${passage._id}')">
+              <i class="fas fa-edit"></i> Edit
+            </button>
+            <button class="delete" onclick="deletePassage('${passage._id}')">
+              <i class="fas fa-trash-alt"></i> Delete
+            </button>
+          </div>
+        `;
+        passageList.appendChild(div);
+      });
+
+      document.getElementById('page-info').textContent = `Page ${currentPage} of ${Math.ceil(filteredPassages.length / passagesPerPage)}`;
+      document.getElementById('prev-page').disabled = currentPage === 1;
+      document.getElementById('next-page').disabled = end >= filteredPassages.length;
+    }
+
+    function changePage(delta) {
+      currentPage += delta;
+      if (currentPage < 1) currentPage = 1;
+      displayPassages();
+    }
+
+    const debouncedFilterPassages = debounce(() => {
+      currentPage = 1;
+      displayPassages();
+    }, 300);
+
+    function filterPassages() {
+      debouncedFilterPassages();
+    }
+
+    async function addPassage() {
+      const title = sanitizeInput(document.getElementById('passage-name').value.trim());
+      const content = sanitizeInput(document.getElementById('new-passage').value.trim());
+      const titleError = document.getElementById('passage-name-error');
+      const contentError = document.getElementById('passage-content-error');
+      const spinner = document.getElementById('add-passage-spinner');
+
+      titleError.textContent = '';
+      contentError.textContent = '';
+
+      if (!title) {
+        titleError.textContent = 'Passage name is required.';
+        return;
+      }
+      if (!content) {
+        contentError.textContent = 'Passage content is required.';
+        return;
+      }
+
+      spinner.style.display = 'block';
+      try {
+        const response = await fetchWithAuth(`${API_BASE_URL}/passages`, {
+          method: 'POST',
+          body: JSON.stringify({ title, content }),
+        });
+        const newPassage = response.data;
+        passages.push(newPassage);
+        document.getElementById('passage-name').value = '';
+        document.getElementById('new-passage').value = '';
+        alert('Passage added successfully!');
+        await fetchAllPassages();
+        showSection(viewPassagesSection);
+      } catch (error) {
+        console.error('Error adding passage:', error);
+        contentError.textContent = error.message || 'Failed to add passage. Please try again.';
+      } finally {
+        spinner.style.display = 'none';
+      }
+    }
+
+    async function deletePassage(id) {
+      if (!confirm('Are you sure you want to delete this passage? This action cannot be undone.')) return;
+      try {
+        const response = await fetchWithAuth(`${API_BASE_URL}/passages/${id}`, {
+          method: 'DELETE',
+        });
+        passages = passages.filter(p => p._id !== id);
+        displayPassages();
+        populatePassageSelect();
+        fetchAllAssignedPassages();
+        alert('Passage deleted successfully!');
+      } catch (error) {
+        console.error('Error deleting passage:', error);
+        alert(error.message);
+      }
+    }
+
+    function populatePassageSelect() {
+      passageSelect.innerHTML = '<option value="">Select a passage</option>';
+      passages.forEach(passage => {
+        const option = document.createElement('option');
+        option.value = passage._id;
+        option.textContent = passage.title;
+        passageSelect.appendChild(option);
+      });
+    }
+
+    async function assignPassage() {
+      const passageId = passageSelect.value;
+      const checkboxes = document.querySelectorAll('.assign-section input[type="checkbox"]:checked');
+      const testTypesToAdd = Array.from(checkboxes).map(cb => cb.value);
+      const passageError = document.getElementById('passage-select-error');
+      const testTypeError = document.getElementById('test-type-error');
+      const spinner = document.getElementById('assign-passage-spinner');
+
+      passageError.textContent = '';
+      testTypeError.textContent = '';
+
+      if (!passageId) {
+        passageError.textContent = 'Please select a passage.';
+        return;
+      }
+      if (testTypesToAdd.length === 0) {
+        testTypeError.textContent = 'Please select at least one test.';
+        return;
+      }
+
+      spinner.style.display = 'block';
+      try {
+        const passage = passages.find(p => p._id === passageId);
+        const updatedTestTypes = [...new Set([...(passage.testTypes || []), ...testTypesToAdd])];
+        const response = await fetchWithAuth(`${API_BASE_URL}/passages/${passageId}`, {
+          method: 'PUT',
+          body: JSON.stringify({
+            title: passage.title,
+            content: passage.content,
+            testTypes: updatedTestTypes,
+          }),
+        });
+        const updatedPassage = response.data;
+        passages = passages.map(p => (p._id === passageId ? updatedPassage : p));
+        alert(`Passage assigned to: ${testTypesToAdd.join(', ')}`);
+        populatePassageSelect();
+        document.querySelectorAll('.assign-section input[type="checkbox"]').forEach(cb => cb.checked = false);
+        fetchAllAssignedPassages();
+      } catch (error) {
+        console.error('Error assigning passage:', error);
+        alert(error.message);
+      } finally {
+        spinner.style.display = 'none';
+      }
+    }
+
+    // Add new functions for handling the modal
+    const assignedPassagesModal = document.getElementById('assigned-passages-modal');
+    const assignedPassagesList = document.getElementById('assigned-passages-list');
+    const assignedPassagesTitle = document.getElementById('assigned-passages-title');
+
+    async function showAssignedPassages(testType) {
+      try {
+        assignedPassagesTitle.textContent = testType;
+        assignedPassagesList.innerHTML = `
+          <div class="spinner-container">
+            <div class="spinner"></div>
+          </div>
+        `;
+        
+        const response = await fetchWithAuth(`${API_BASE_URL}/passages/test/${encodeURIComponent(testType)}`);
+        const passages = response.data || [];
+        
+        if (passages.length === 0) {
+          assignedPassagesList.innerHTML = `
+            <div class="no-assigned-passages">
+              <i class="fas fa-file-alt"></i><br>
+              No passages assigned to this test yet.
+            </div>
+          `;
+        } else {
+          assignedPassagesList.innerHTML = `
+            <div class="modal-header-info">
+              <i class="fas fa-info-circle"></i>
+              Total passages assigned: ${passages.length}
+            </div>
+            ${passages.map(p => `
+              <div class="assigned-passage-item">
+                <span>${sanitizeInput(p.title)}</span>
+                <button onclick="unassignPassageFromTest('${p._id}', '${testType}')">
+                  <i class="fas fa-unlink"></i>
+                  Unassign
+                </button>
+              </div>
+            `).join('')}
+          `;
+        }
+
+        assignedPassagesModal.classList.add('show');
+        setTimeout(() => {
+          assignedPassagesModal.querySelector('.assigned-passages-content').classList.add('show');
+        }, 10);
+      } catch (error) {
+        console.error(`Error fetching passages for ${testType}:`, error);
+        assignedPassagesList.innerHTML = `
+          <div class="no-assigned-passages">
+            <i class="fas fa-exclamation-triangle"></i><br>
+            Error loading passages: ${error.message}
+          </div>
+        `;
+      }
+    }
+
+    function closeAssignedPassagesModal() {
+      const modalContent = assignedPassagesModal.querySelector('.assigned-passages-content');
+      modalContent.classList.remove('show');
+      setTimeout(() => {
+        assignedPassagesModal.classList.remove('show');
+        assignedPassagesList.innerHTML = '';
+      }, 300);
+    }
+
+    // Close modal when clicking outside
+    assignedPassagesModal.addEventListener('click', (event) => {
+      if (event.target === assignedPassagesModal) {
+        closeAssignedPassagesModal();
+      }
+    });
+
+    // Close modal on escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && assignedPassagesModal.classList.contains('show')) {
+        closeAssignedPassagesModal();
+      }
+    });
+
+    // Update unassign function to close modal after unassigning
+    async function unassignPassageFromTest(passageId, testType) {
+      if (!confirm(`Are you sure you want to unassign this passage from ${testType}?`)) return;
+      try {
+        const passage = passages.find(p => p._id === passageId);
+        if (!passage) throw new Error('Passage not found');
+        
+        const updatedTestTypes = (passage.testTypes || []).filter(t => t !== testType);
+        const response = await fetchWithAuth(`${API_BASE_URL}/passages/${passageId}`, {
+          method: 'PUT',
+          body: JSON.stringify({
+            title: passage.title,
+            content: passage.content,
+            testTypes: updatedTestTypes,
+          }),
+        });
+        
+        passages = passages.map(p => p._id === passageId ? { ...p, testTypes: updatedTestTypes } : p);
+        showAssignedPassages(testType); // Refresh the modal
+        displayPassages();
+        populatePassageSelect();
+        alert('Passage unassigned successfully!');
+      } catch (error) {
+        console.error('Error unassigning passage:', error);
+        alert(error.message);
+      }
+    }
+
+    // Initialize
+    loadHeaderAndFooter();
+    checkAuth();
+
+    // Set initial display state
+    document.addEventListener('DOMContentLoaded', function() {
+      const loginSection = document.getElementById('login-section');
+      const dashboardContainer = document.getElementById('dashboard-container');
+      
+      // Check if user is already logged in
+      const accessToken = localStorage.getItem('accessToken');
+      if (!accessToken || accessToken === 'undefined' || accessToken === 'null') {
+        loginSection.style.display = 'flex';
+        dashboardContainer.style.display = 'none';
+      } else {
+        loginSection.style.display = 'none';
+        dashboardContainer.style.display = 'flex';
+      }
+    });
+  </script>
+</body>
+</html>

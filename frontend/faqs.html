@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Find answers to frequently asked questions about TypingHub.in's typing tests and courses.">
+  <meta name="keywords" content="TypingHub FAQs, typing test help, typing course questions">
+  <title>FAQs - TypingHub.in ❓</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Serif:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" loading="lazy">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Times New Roman', Times, serif;
+      background: #f5f5f5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+    .faq-hero-section {
+      background: #e3f2fd;
+      padding: 60px 0;
+      text-align: center;
+      border-top: 2px solid #1976d2;
+      border-bottom: 2px solid #1976d2;
+      margin-bottom: 40px;
+    }
+    .faq-hero-content {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    .faq-hero-content h1 {
+      font-family: 'Roboto Serif', serif;
+      font-size: 36px;
+      font-weight: 700;
+      color: #1a2a44;
+      margin-bottom: 20px;
+    }
+    .faq-hero-content p {
+      font-size: 18px;
+      color: #555;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+    .faq-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      display: grid;
+      grid-template-columns: 1fr 3fr;
+      gap: 40px;
+    }
+    .faq-nav {
+      position: sticky;
+      top: 20px;
+      height: fit-content;
+    }
+    .faq-nav-list {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .faq-nav-list h2 {
+      font-family: 'Roboto Serif', serif;
+      font-size: 20px;
+      color: #1a2a44;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #1976d2;
+    }
+    .faq-nav-list ul {
+      list-style: none;
+    }
+    .faq-nav-list li {
+      margin-bottom: 10px;
+    }
+    .faq-nav-list a {
+      color: #333;
+      text-decoration: none;
+      font-size: 16px;
+      display: block;
+      padding: 8px;
+      border-radius: 4px;
+      transition: all 0.3s;
+    }
+    .faq-nav-list a:hover,
+    .faq-nav-list a.active {
+      background: #e3f2fd;
+      color: #1976d2;
+    }
+    .faq-sections {
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+    }
+    .faq-section {
+      background: #fff;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .faq-section h2 {
+      font-family: 'Roboto Serif', serif;
+      font-size: 28px;
+      color: #1a2a44;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #1976d2;
+    }
+    .faq-item {
+      margin-bottom: 20px;
+      border-bottom: 1px solid #e0e0e0;
+      padding-bottom: 20px;
+    }
+    .faq-item:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+    .faq-question {
+      font-family: 'Roboto Serif', serif;
+      font-size: 20px;
+      color: #1a2a44;
+      margin-bottom: 10px;
+      font-weight: 600;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .faq-question i {
+      color: #1976d2;
+      font-size: 24px;
+      margin-top: 2px;
+    }
+    .faq-answer {
+      font-size: 16px;
+      color: #555;
+      line-height: 1.6;
+      padding-left: 34px;
+    }
+    .faq-answer p {
+      margin-bottom: 10px;
+    }
+    .faq-answer ul {
+      margin-left: 20px;
+      margin-bottom: 10px;
+    }
+    .faq-answer li {
+      margin-bottom: 5px;
+    }
+    .faq-answer a {
+      color: #1976d2;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    .faq-answer a:hover {
+      color: #1565c0;
+    }
+    .tip-box {
+      background: #e8f5e9;
+      border-left: 4px solid #4caf50;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 4px;
+    }
+    .tip-box h4 {
+      font-family: 'Roboto Serif', serif;
+      font-size: 18px;
+      color: #2e7d32;
+      margin-bottom: 8px;
+    }
+    .tip-box p {
+      color: #1b5e20;
+      margin-bottom: 0;
+    }
+    .search-box {
+      margin-bottom: 20px;
+      position: relative;
+    }
+    .search-box input {
+      width: 100%;
+      padding: 12px 40px 12px 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 4px;
+      font-size: 16px;
+      transition: border-color 0.3s;
+    }
+    .search-box input:focus {
+      outline: none;
+      border-color: #1976d2;
+    }
+    .search-box i {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #666;
+    }
+    @media (max-width: 992px) {
+      .faq-content {
+        grid-template-columns: 1fr;
+      }
+      .faq-nav {
+        position: static;
+      }
+      }
+    @media (max-width: 768px) {
+      .faq-hero-content h1 {
+        font-size: 28px;
+      }
+      .faq-hero-content p {
+        font-size: 16px;
+      }
+      .faq-section h2 {
+        font-size: 24px;
+      }
+      .faq-question {
+        font-size: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="header"></div>
+  <main class="main-content">
+    <div class="faq-hero-section">
+      <div class="faq-hero-content">
+        <h1>Frequently Asked Questions ❓</h1>
+        <p>Find answers to common questions about TypingHub.in's typing tests, courses, and features.</p>
+      </div>
+    </div>
+
+    <div class="faq-content">
+      <aside class="faq-nav">
+        <div class="faq-nav-list">
+          <div class="search-box">
+            <input type="text" placeholder="Search FAQs..." id="faqSearch">
+            <i class="fas fa-search"></i>
+          </div>
+          <h2>Categories</h2>
+          <ul>
+            <li><a href="#general" class="active">General Questions</a></li>
+            <li><a href="#tests">Typing Tests</a></li>
+            <li><a href="#courses">Typing Courses</a></li>
+            <li><a href="#certificates">Certificates</a></li>
+            <li><a href="#account">Account & Profile</a></li>
+            <li><a href="#technical">Technical Issues</a></li>
+            <li><a href="#payment">Payment & Billing</a></li>
+            <li><a href="#support">Support & Help</a></li>
+          </ul>
+        </div>
+      </aside>
+
+      <div class="faq-sections">
+        <section id="general" class="faq-section">
+          <h2>General Questions</h2>
+          
+          <div class="faq-item">
+            <div class="faq-question">
+              <i class="fas fa-question-circle"></i>
+              <span>What is TypingHub.in?</span>
+            </div>
+            <div class="faq-answer">
+              <p>TypingHub.in is a comprehensive online platform designed to help users improve their typing skills. We offer:</p>
+              <ul>
+                <li>Free typing tests and practice sessions</li>
+                <li>Exam-specific typing tests (SSC, CHSL, etc.)</li>
+                <li>Structured typing courses</li>
+                <li>Performance tracking and analytics</li>
+                <li>Typing certificates</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">
+              <i class="fas fa-question-circle"></i>
+              <span>Is TypingHub.in free to use?</span>
+            </div>
+            <div class="faq-answer">
+              <p>Yes, most of our features are free to use, including:</p>
+              <ul>
+                <li>Basic typing tests</li>
+                <li>Practice sessions</li>
+                <li>Performance tracking</li>
+              </ul>
+              <p>We also offer premium features for advanced users who need additional resources and features.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">
+              <i class="fas fa-question-circle"></i>
+              <span>Do I need to create an account?</span>
+            </div>
+            <div class="faq-answer">
+              <p>While you can access basic typing tests without an account, we recommend creating one to:</p>
+              <ul>
+                <li>Track your progress over time</li>
+                <li>Save your test results</li>
+                <li>Access premium features</li>
+                <li>Generate typing certificates</li>
+              </ul>
+              <div class="tip-box">
+                <h4>Pro Tip</h4>
+                <p>Creating an account is free and takes less than a minute!</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="tests" class="faq-section">
+          <h2>Typing Tests</h2>
+          
+          <div class="faq-item">
+            <div class="faq-question">
+              <i class="fas fa-question-circle"></i>
+              <span>How are typing speed and accuracy calculated?</span>
+            </div>
+            <div class="faq-answer">
+              <p>We use standard metrics to calculate your typing performance:</p>
+              <ul>
+                <li>WPM (Words Per Minute) = (Total Characters / 5) / Time in Minutes</li>
+                <li>Accuracy = (Correct Characters / Total Characters) × 100</li>
+                <li>Net WPM = WPM × (Accuracy / 100)</li>
+              </ul>
+              <div class="tip-box">
+                <h4>Important Note</h4>
+                <p>Our calculations follow international standards and are accepted by most examination boards.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">
+              <i class="fas fa-question-circle"></i>
+              <span>Which typing tests are available?</span>
+            </div>
+            <div class="faq-answer">
+              <p>We offer various types of typing tests:</p>
+              <ul>
+                <li>General typing tests (1-5 minutes)</li>
+                <li>SSC CGL typing test</li>
+                <li>SSC CHSL typing test</li>
+                <li>RRB NTPC typing test</li>
+                <li>CPCT typing test</li>
+                <li>Custom duration tests</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">
+              <i class="fas fa-question-circle"></i>
+              <span>Can I practice with exam-specific content?</span>
+            </div>
+            <div class="faq-answer">
+              <p>Yes, we provide exam-specific practice materials that match the format and difficulty level of various government exams.</p>
+              <div class="tip-box">
+                <h4>Pro Tip</h4>
+                <p>Use our exam-wise practice tests to familiarize yourself with the exact format of your target examination.</p>
+            </div>
+          </div>
+        </div>
+        </section>
+
+        <section id="courses" class="faq-section">
+          <h2>Typing Courses</h2>
+          
+              <div class="faq-item">
+            <div class="faq-question">
+              <i class="fas fa-question-circle"></i>
+              <span>What typing courses do you offer?</span>
+            </div>
+            <div class="faq-answer">
+              <p>Our courses cater to different skill levels:</p>
+              <ul>
+                <li>Beginner's Touch Typing Course</li>
+                <li>Advanced Speed Building Course</li>
+                <li>Exam Preparation Courses</li>
+                <li>Professional Typing Course</li>
+              </ul>
+              <div class="tip-box">
+                <h4>Course Selection Tip</h4>
+                <p>Take our free typing assessment to determine the best course for your skill level.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">
+              <i class="fas fa-question-circle"></i>
+              <span>How long does it take to complete a course?</span>
+            </div>
+            <div class="faq-answer">
+              <p>Course duration varies based on:</p>
+              <ul>
+                <li>Your current typing speed</li>
+                <li>Practice frequency</li>
+                <li>Target speed goals</li>
+                <li>Course complexity</li>
+              </ul>
+              <p>On average, most users see significant improvement within 4-6 weeks of regular practice.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="certificates" class="faq-section">
+          <h2>Certificates</h2>
+          
+              <div class="faq-item">
+            <div class="faq-question">
+              <i class="fas fa-question-circle"></i>
+              <span>How do I get a typing certificate?</span>
+            </div>
+            <div class="faq-answer">
+              <p>To obtain a typing certificate:</p>
+              <ol>
+                <li>Complete a certificate test</li>
+                <li>Achieve the minimum required speed and accuracy</li>
+                <li>Verify your account details</li>
+                <li>Download your certificate</li>
+              </ol>
+              <div class="tip-box">
+                <h4>Certificate Validity</h4>
+                <p>Our certificates include a unique verification code and QR code for authenticity verification.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">
+              <i class="fas fa-question-circle"></i>
+              <span>Are your certificates recognized?</span>
+            </div>
+            <div class="faq-answer">
+              <p>Our certificates are designed for personal achievement and skill verification. While they demonstrate your typing proficiency, please check with your target organization about their specific requirements.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="account" class="faq-section">
+          <h2>Account & Profile</h2>
+          
+          <div class="faq-item">
+            <div class="faq-question">
+              <i class="fas fa-question-circle"></i>
+              <span>How do I update my profile information?</span>
+            </div>
+            <div class="faq-answer">
+              <p>To update your profile:</p>
+              <ol>
+                <li>Log in to your account</li>
+                <li>Click on your profile picture/name</li>
+                <li>Select "Edit Profile"</li>
+                <li>Update your information</li>
+                <li>Save changes</li>
+              </ol>
+            </div>
+          </div>
+
+              <div class="faq-item">
+            <div class="faq-question">
+              <i class="fas fa-question-circle"></i>
+              <span>Can I delete my account?</span>
+            </div>
+            <div class="faq-answer">
+              <p>Yes, you can delete your account and all associated data by:</p>
+              <ol>
+                <li>Going to Account Settings</li>
+                <li>Selecting "Delete Account"</li>
+                <li>Confirming your decision</li>
+              </ol>
+              <div class="tip-box">
+                <h4>Important</h4>
+                <p>Account deletion is permanent and cannot be undone. Please download any certificates or results you want to keep before deleting your account.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="technical" class="faq-section">
+          <h2>Technical Issues</h2>
+          
+              <div class="faq-item">
+            <div class="faq-question">
+              <i class="fas fa-question-circle"></i>
+              <span>What browsers are supported?</span>
+            </div>
+            <div class="faq-answer">
+              <p>We support all modern browsers including:</p>
+              <ul>
+                <li>Google Chrome (recommended)</li>
+                <li>Mozilla Firefox</li>
+                <li>Microsoft Edge</li>
+                <li>Safari</li>
+              </ul>
+              <div class="tip-box">
+                <h4>Best Performance</h4>
+                <p>For the best experience, use the latest version of Google Chrome or Firefox.</p>
+              </div>
+            </div>
+          </div>
+
+              <div class="faq-item">
+            <div class="faq-question">
+              <i class="fas fa-question-circle"></i>
+              <span>Why isn't my keyboard working correctly?</span>
+            </div>
+            <div class="faq-answer">
+              <p>If you're experiencing keyboard issues:</p>
+              <ol>
+                <li>Check your keyboard language settings</li>
+                <li>Clear your browser cache</li>
+                <li>Disable browser extensions</li>
+                <li>Try a different browser</li>
+              </ol>
+              <div class="tip-box">
+                <h4>Quick Fix</h4>
+                <p>Most keyboard issues can be resolved by refreshing the page or restarting your browser.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="payment" class="faq-section">
+          <h2>Payment & Billing</h2>
+          
+              <div class="faq-item">
+            <div class="faq-question">
+              <i class="fas fa-question-circle"></i>
+              <span>What payment methods do you accept?</span>
+            </div>
+            <div class="faq-answer">
+              <p>We accept various payment methods:</p>
+              <ul>
+                <li>Credit/Debit Cards</li>
+                <li>UPI</li>
+                <li>Net Banking</li>
+                <li>Digital Wallets</li>
+              </ul>
+              <div class="tip-box">
+                <h4>Secure Payments</h4>
+                <p>All payments are processed securely through our payment gateway partners.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">
+              <i class="fas fa-question-circle"></i>
+              <span>How do refunds work?</span>
+            </div>
+            <div class="faq-answer">
+              <p>Our refund policy:</p>
+              <ul>
+                <li>7-day refund window for courses</li>
+                <li>Must request refund in writing</li>
+                <li>Processed within 5-7 business days</li>
+                <li>Original payment method used for refund</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section id="support" class="faq-section">
+          <h2>Support & Help</h2>
+          
+              <div class="faq-item">
+            <div class="faq-question">
+              <i class="fas fa-question-circle"></i>
+              <span>How can I get help?</span>
+            </div>
+            <div class="faq-answer">
+              <p>We offer multiple support channels:</p>
+              <ul>
+                <li>Email: support@typinghub.in</li>
+                <li>Live Chat (9 AM - 6 PM IST)</li>
+                <li>Help Documentation</li>
+                <li>Video Tutorials</li>
+              </ul>
+              <div class="tip-box">
+                <h4>Quick Response</h4>
+                <p>We aim to respond to all queries within 24 hours.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">
+              <i class="fas fa-question-circle"></i>
+              <span>Can I suggest new features?</span>
+            </div>
+            <div class="faq-answer">
+              <p>Yes! We welcome user feedback and suggestions. You can:</p>
+              <ul>
+                <li>Use the feedback form in your account</li>
+                <li>Email your suggestions to feedback@typinghub.in</li>
+                <li>Participate in our user surveys</li>
+              </ul>
+          </div>
+        </div>
+        </section>
+      </div>
+    </div>
+  </main>
+  <div id="footer"></div>
+  <script defer>
+    // Load header and footer
+    fetch('./header.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('header').innerHTML = data;
+        initializeNavigation();
+      });
+
+    fetch('./footer.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('footer').innerHTML = data;
+      });
+
+    function initializeNavigation() {
+      const navLinks = document.querySelectorAll('.nav-links a');
+      navLinks.forEach(link => {
+        if (link.getAttribute('href') === 'faqs.html') {
+          link.classList.add('active');
+        }
+      });
+    }
+
+    // Smooth scrolling for navigation
+    document.querySelectorAll('.faq-nav-list a').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const targetId = link.getAttribute('href').substring(1);
+        const targetSection = document.getElementById(targetId);
+        targetSection.scrollIntoView({ behavior: 'smooth' });
+
+        // Update active link
+        document.querySelectorAll('.faq-nav-list a').forEach(a => a.classList.remove('active'));
+        link.classList.add('active');
+      });
+    });
+
+    // Highlight current section on scroll
+    window.addEventListener('scroll', () => {
+      const sections = document.querySelectorAll('.faq-section');
+      let currentSection = '';
+
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        const sectionHeight = section.clientHeight;
+        if (window.pageYOffset >= sectionTop - 100) {
+          currentSection = section.getAttribute('id');
+      }
+      });
+
+      document.querySelectorAll('.faq-nav-list a').forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href').substring(1) === currentSection) {
+          link.classList.add('active');
+        }
+      });
+    });
+
+    // FAQ Search functionality
+    const searchInput = document.getElementById('faqSearch');
+    const faqItems = document.querySelectorAll('.faq-item');
+
+    searchInput.addEventListener('input', (e) => {
+      const searchTerm = e.target.value.toLowerCase();
+      
+      faqItems.forEach(item => {
+        const question = item.querySelector('.faq-question').textContent.toLowerCase();
+        const answer = item.querySelector('.faq-answer').textContent.toLowerCase();
+        
+        if (question.includes(searchTerm) || answer.includes(searchTerm)) {
+          item.style.display = 'block';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,1220 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TypingHub - SSC CHSL Typing Test</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Times New Roman', Times, serif;
+      background: #f5f5f5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      margin: 0;
+      width: 100vw;
+      overflow-x: hidden;
+    }
+    .main-content {
+      flex: 1;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      width: 100vw;
+      padding: 0;
+      margin: 0;
+    }
+    nav {
+      background: #fff;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      width: 100vw;
+      max-width: none;
+      margin-bottom: 0;
+    }
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .nav-brand img {
+      width: 70px;
+      height: auto;
+    }
+    .nav-brand a {
+      font-family: 'Roboto Serif', serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: #1976d2;
+      text-decoration: none;
+    }
+    .nav-brand a:hover {
+      color: #40c4ff;
+    }
+    .nav-links {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .nav-links a {
+      color: #333;
+      text-decoration: none;
+      font-size: 16px;
+      padding: 8px 15px;
+      border-radius: 4px;
+      font-weight: 400;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .nav-links a:hover {
+      background-color: #FFFF00;
+      color: #000;
+    }
+    .nav-links a.active {
+      background-color: #1976d2;
+      color: #fff;
+    }
+    h3 {
+      font-family: 'Roboto Serif', serif;
+      color: #1a2a44;
+      font-size: 20px;
+      font-weight: 700;
+      text-transform: uppercase;
+      text-align: center;
+    }
+    h4 {
+      font-family: 'Roboto Serif', serif;
+      color: #1a2a44;
+      font-size: 22px;
+      font-weight: 600;
+      margin: 15px 0 10px;
+    }
+    p {
+      color: #555;
+      font-size: 16px;
+      line-height: 1.5;
+      margin-bottom: 5px;
+    }
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      margin-right: 10px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+    .btn-primary {
+      background: #1976d2;
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: #1565c0;
+    }
+    .btn-danger {
+      background: #ef5350;
+      color: #fff;
+    }
+    .btn-danger:hover {
+      background: #d32f2f;
+    }
+    .btn-success {
+      background: #4caf50;
+      color: #fff;
+    }
+    .btn-success:hover {
+      background: #388e3c;
+    }
+    .btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+    .test-container {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      width: 100vw;
+      max-width: none;
+      min-height: calc(100vh - 80px - 200px);
+      padding: 0 10px;
+      gap: 0;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      margin-top: 0;
+    }
+    .test-main {
+      flex: 3;
+      min-width: 300px;
+      display: flex;
+      flex-direction: column;
+      padding-right: 10px;
+      margin-right: 0;
+    }
+    .result-section {
+      flex: 1;
+      min-width: 250px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      position: relative;
+      padding-left: 10px;
+      margin-left: 0;
+      background: linear-gradient(135deg, #f8fafc, #e3f2fd);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+      border-radius: 6px;
+      border-left: 1px solid #ccc;
+    }
+    .test-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      margin-top: 0;
+      background: #f9f9f9;
+      padding: 10px;
+      border-radius: 6px;
+      width: 100%;
+      font-size: 14px;
+      gap: 15px;
+      height: 48px;
+    }
+    .selector-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .selector-label {
+      font-size: 14px;
+      font-weight: 500;
+      color: #1a2a44;
+      font-family: 'Roboto Serif', serif;
+      white-space: nowrap;
+    }
+    select {
+      padding: 7px;
+      font-size: 18px;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      background: #fff;
+      font-family: 'Times New Roman', Times, serif;
+      width: 180px;
+      transition: border-color 0.3s;
+    }
+    select:focus {
+      border-color: #1976d2;
+      outline: none;
+    }
+    .timer {
+      font-size: 14px;
+      font-weight: 500;
+      color: #fff;
+      background: #ef5350;
+      padding: 6px 10px;
+      border-radius: 6px;
+    }
+    .timer.low-time {
+      background: #d32f2f;
+    }
+    .sample-text-container {
+      height: 200px;
+      overflow-y: auto;
+      background: #fff;
+      border: 2px solid #ccc;
+      border-radius: 6px;
+      padding: 10px;
+      margin-bottom: 10px;
+      width: 100%;
+      cursor: default;
+      line-height: 28px;
+    }
+    .sample-text {
+      font-size: 18px;
+      line-height: 28px;
+      white-space: pre-wrap;
+      font-family: 'Times New Roman', Times, serif;
+      user-select: none;
+      word-spacing: normal;
+    }
+    .word {
+      display: inline;
+      margin: 0;
+      padding: 0;
+    }
+    .current-word {
+      padding: 0 1px;
+      border-radius: 2px;
+    }
+    .correct-char {
+      background: #4caf50;
+      color: #fff;
+      padding: 1px;
+    }
+    .incorrect-char {
+      background: #ef5350;
+      color: #fff;
+      padding: 1px;
+    }
+    textarea {
+      width: 100%;
+      height: 200px;
+      resize: none;
+      padding: 7px;
+      font-size: 18px;
+      border: 2px solid #ccc;
+      border-radius: 6px;
+      background: #fff;
+      font-family: 'Times New Roman', Times, serif;
+      margin-bottom: 10px;
+      transition: border-color 0.3s;
+      line-height: 28px;
+      word-spacing: normal;
+    }
+    textarea:focus {
+      border-color: #1976d2;
+      outline: none;
+    }
+    .control-buttons {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .result-section .result-header {
+      background: #f9f9f9;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+    .result-section .metric-block {
+      padding: 8px 12px;
+      border-radius: 6px;
+      margin: 5px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+      font-family: 'Times New Roman', Times, serif;
+      background: #fff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      transition: transform 0.2s, background-color 0.3s;
+      animation: fadeInMetric 0.5s ease;
+    }
+    .result-section .metric-block:hover {
+      transform: translateY(-2px);
+      background: #fafafa;
+    }
+    @keyframes fadeInMetric {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .result-section .metric-block span:first-child::before {
+      content: '';
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+    .result-section .metric-block:nth-child(2) span:first-child::before {
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%231976d2"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm1-13h-2v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>') no-repeat center/16px;
+    }
+    .result-section .metric-block:nth-child(3) span:first-child::before {
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%231976d2"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8 8 3.59 8 8-3.59-8 8zm1-13h-2v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>') no-repeat center/16px;
+    }
+    .result-section .metric-block:nth-child(4) span:first-child::before {
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%234caf50"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>') no-repeat center/16px;
+    }
+    .result-section .metric-block:nth-child(5) span:first-child::before {
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ef5350"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>') no-repeat center/16px;
+    }
+    .result-section .metric-block:nth-child(6) span:first-child::before {
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%231976d2"><path d="M4 4h16v16H4V4zm2 2v12h12V6H6z"/></svg>') no-repeat center/16px;
+    }
+    .result-section .metric-block:nth-child(7) span:first-child::before {
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%234caf50"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>') no-repeat center/16px;
+    }
+    .result-section .metric-block:nth-child(8) span:first-child::before {
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ef5350"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>') no-repeat center/16px;
+    }
+    .result-section .metric-block span:last-child {
+      font-size: 16px;
+      font-weight: 600;
+      color: #000;
+      text-align: right;
+      min-width: 80px;
+      transition: color 0.3s;
+    }
+    .feedback-container {
+      position: relative;
+      margin: 10px 12px;
+      padding: 15px;
+      background: #ff9800;
+      color: #fff;
+      font-family: 'Times New Roman', Times, serif;
+      font-size: 20px;
+      line-height: 1.5;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2), 0 0 10px rgba(255,152,0,0.5);
+      transform: skew(-5deg);
+      display: none;
+    }
+    .feedback-container.show {
+      display: block;
+    }
+    .feedback-text {
+      transform: skew(5deg);
+    }
+    .feedback-cancel {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      background: #d32f2f;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      font-size: 14px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      transition: background 0.3s;
+    }
+    .feedback-cancel:hover {
+      background: #b71c1c;
+    }
+    @media (max-width: 768px) {
+      .test-container {
+        flex-direction: column;
+        padding: 10px;
+        width: 100vw;
+        max-width: none;
+      }
+      .test-main {
+        padding-right: 0;
+      }
+      .result-section {
+        position: static;
+        order: -1;
+        margin-bottom: 10px;
+        padding-left: 0;
+        border-left: none;
+      }
+      .sample-text-container, textarea {
+        height: 150px;
+      }
+      .nav-brand img {
+        width: 35px;
+      }
+      .nav-brand a {
+        font-size: 18px;
+      }
+      .nav-links {
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+        align-items: stretch;
+      }
+      .nav-links a {
+        padding: 8px;
+        text-align: center;
+      }
+      .feedback-container {
+        font-size: 18px;
+        padding: 0 8px;
+      }
+      .control-buttons {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+    }
+    @media (max-width: 600px) {
+      nav {
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px;
+      }
+      .test-header {
+        flex-direction: column;
+        gap: 10px;
+        height: auto;
+      }
+      .selector-group {
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+      }
+      select {
+        width: 100%;
+      }
+      .result-section .metric-block {
+        font-size: 12px;
+      }
+      .result-section .metric-block span:last-child {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="header"></div>
+  <main class="main-content">
+    <div id="typing-test-page">
+      <div class="test-container">
+        <div class="test-main">
+          <div class="test-header">
+            <div class="selector-group">
+              <label for="passage-selector" class="selector-label">Select Passage</label>
+              <select id="passage-selector"></select>
+            </div>
+            <div class="selector-group">
+              <label for="exam-mode-selector" class="selector-label">Mode of Exam</label>
+              <select id="exam-mode-selector">
+                <option value="Paper Typing" selected>Paper Typing</option>
+                <option value="Screen Typing">Screen Typing</option>
+              </select>
+            </div>
+            <div class="selector-group">
+              <label for="timer-duration" class="selector-label">Duration</label>
+              <select id="timer-duration">
+                <option value="900" selected>15 min</option>
+                <option value="1200">20 min</option>
+              </select>
+            </div>
+            <div id="timer" class="timer">15:00</div>
+          </div>
+          <div id="sample-text-container" class="sample-text-container" tabindex="0">
+            <p id="sample-text" class="sample-text"></p>
+          </div>
+          <textarea id="typing-area" placeholder="Start typing here..." disabled></textarea>
+          <div class="control-buttons">
+            <button id="start-test" class="btn btn-primary">Start</button>
+            <button id="stop-test" class="btn btn-danger" disabled>Pause</button>
+            <button id="restart-test" class="btn btn-success" disabled>Restart</button>
+            <button id="submit-test" class="btn btn-danger" disabled>Submit</button>
+          </div>
+        </div>
+        <div class="result-section">
+          <div class="result-header">
+            <h3>RESULT</h3>
+          </div>
+          <div class="metric-block">
+            <span>Gross Speed:</span>
+            <span><span id="live-gross-speed">0</span> wpm</span>
+          </div>
+          <div class="metric-block">
+            <span>Net Speed:</span>
+            <span><span id="live-net-speed">0</span> wpm</span>
+          </div>
+          <div class="metric-block">
+            <span>Accuracy:</span>
+            <span><span id="live-accuracy">0</span>%</span>
+          </div>
+          <div class="metric-block">
+            <span>Mistakes:</span>
+            <span id="live-mistakes">0</span>
+          </div>
+          <div class="metric-block">
+            <span>Total Words:</span>
+            <span id="live-total-words">0</span>
+          </div>
+          <div class="metric-block">
+            <span>Correct Words:</span>
+            <span id="live-correct-words">0</span>
+          </div>
+          <div class="metric-block">
+            <span>Incorrect Words:</span>
+            <span id="live-incorrect-words">0</span>
+          </div>
+          <div id="feedback-container" class="feedback-container">
+            <p id="feedback-text" class="feedback-text"></p>
+            <button id="feedback-cancel" class="feedback-cancel">✕</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <div id="footer"></div>
+  <script>
+    var gk_isXlsx = false;
+    var gk_xlsxFileLookup = {};
+    var gk_fileData = {};
+    function filledCell(cell) {
+      return cell !== '' && cell != null;
+    }
+    function loadFileData(filename) {
+      if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+        try {
+          var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+          var firstSheetName = workbook.SheetNames[0];
+          var worksheet = workbook.Sheets[firstSheetName];
+          var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+          var filteredData = jsonData.filter(row => row.some(filledCell));
+          var headerRowIndex = filteredData.findIndex((row, index) =>
+            row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+          );
+          if (headerRowIndex === -1 || headerRowIndex > 25) {
+            headerRowIndex = 0;
+          }
+          var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex));
+          csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+          return csv;
+        } catch (e) {
+          console.error(e);
+          return "";
+        }
+      }
+      return gk_fileData[filename] || "";
+    }
+    function initializeNavigation() {
+      const navLinks = document.querySelectorAll('.nav-links a');
+      navLinks.forEach(link => {
+        if (link && link.getAttribute('href') === 'ssc-chsl-test.html') {
+          link.classList.add('active');
+        } else if (link) {
+          link.classList.remove('active');
+        }
+      });
+    }
+    function alignResultSection() {
+      const testHeader = document.querySelector('.test-header');
+      const sampleTextContainer = document.querySelector('.sample-text-container');
+      const typingArea = document.querySelector('textarea');
+      const resultSection = document.querySelector('.result-section');
+      const testHeaderHeight = testHeader.offsetHeight;
+      const sampleTextHeight = sampleTextContainer.offsetHeight;
+      const typingAreaHeight = typingArea.offsetHeight;
+      const margins = 20;
+      const totalHeight = testHeaderHeight + sampleTextHeight + typingAreaHeight + margins;
+      resultSection.style.height = `${totalHeight}px`;
+    }
+    let passages = [];
+    let passageWords = [];
+    let timerInterval;
+    let timeLeft = 900;
+    let isRunning = false;
+    let currentWordIndex = 0;
+    let typedWords = [];
+    let totalChars = 0;
+    let correctChars = 0;
+    let mistakes = 0;
+    let correctWordsCount = 0;
+    let incorrectWordsCount = 0;
+    let startTime;
+    let wordElements = [];
+    let wordsPerLine = 0;
+    let currentLine = 0;
+    let settings = { mode: 'Paper Typing' };
+    const passageSelector = document.getElementById('passage-selector');
+    const examModeSelector = document.getElementById('exam-mode-selector');
+    const timerDurationSelector = document.getElementById('timer-duration');
+    const timerDisplay = document.getElementById('timer');
+    const sampleTextContainer = document.getElementById('sample-text-container');
+    const sampleText = document.getElementById('sample-text');
+    const typingArea = document.getElementById('typing-area');
+    const startButton = document.getElementById('start-test');
+    const pauseButton = document.getElementById('stop-test');
+    const restartButton = document.getElementById('restart-test');
+    const submitButton = document.getElementById('submit-test');
+    const grossSpeed = document.getElementById('live-gross-speed');
+    const netSpeed = document.getElementById('live-net-speed');
+    const accuracy = document.getElementById('live-accuracy');
+    const mistakesDisplay = document.getElementById('live-mistakes');
+    const totalWords = document.getElementById('live-total-words');
+    const correctWords = document.getElementById('live-correct-words');
+    const incorrectWords = document.getElementById('live-incorrect-words');
+    const feedbackContainer = document.getElementById('feedback-container');
+    const feedbackText = document.getElementById('feedback-text');
+    const feedbackCancel = document.getElementById('feedback-cancel');
+    function normalizeQuotes(text) {
+      return text
+        .replace(/[\u2018\u2019]/g, "'")
+        .replace(/[\u201C\u201D]/g, '"');
+    }
+    function sanitizeInput(input) {
+      const div = document.createElement('div');
+      div.textContent = input;
+      return div.innerHTML;
+    }
+    function formatTime(seconds) {
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    }
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+    function isPunctuation(char) {
+      return /[.,!?;:'"()/]/.test(char);
+    }
+    function getCharacterHighlights(expected, typed) {
+      const normalizedExpected = normalizeQuotes(expected);
+      const normalizedTyped = normalizeQuotes(typed);
+      const result = [];
+      let typedIndex = 0;
+      for (let i = 0; i < normalizedExpected.length; i++) {
+        if (typedIndex < normalizedTyped.length) {
+          if (normalizedExpected[i] === normalizedTyped[typedIndex]) {
+            result.push({ char: normalizedExpected[i], status: 'correct' });
+            typedIndex++;
+          } else {
+            if (i + 1 < normalizedExpected.length && typedIndex < normalizedTyped.length && normalizedExpected[i + 1] === normalizedTyped[typedIndex]) {
+              result.push({ char: normalizedExpected[i], status: 'wrong' });
+            } else {
+              result.push({ char: normalizedExpected[i], status: 'wrong' });
+              typedIndex++;
+            }
+          }
+        } else {
+          result.push({ char: normalizedExpected[i], status: 'wrong' });
+        }
+      }
+      while (typedIndex < normalizedTyped.length) {
+        result.push({ char: normalizedTyped[typedIndex], status: 'wrong' });
+        typedIndex++;
+      }
+      return result;
+    }
+    async function fetchPassages() {
+      try {
+        const response = await fetch('http://localhost:5000/api/passages/test/SSC%20CHSL', {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        if (!response.ok) throw new Error(`Failed to fetch passages: ${response.status}`);
+        passages = await response.json();
+        console.log('Passages fetched:', passages);
+      } catch (error) {
+        console.error('Error fetching passages:', error.message);
+        passages = [];
+        sampleText.textContent = 'Error loading passages. Please check server or contact admin.';
+        alert('Failed to load passages. Please ensure server is running.');
+      }
+    }
+    async function populatePassageSelector() {
+      await fetchPassages();
+      passageSelector.innerHTML = '<option value="">Select Passage</option>';
+      if (passages.length === 0) {
+        passageSelector.innerHTML += '<option value="" disabled>No passages available</option>';
+        sampleText.textContent = 'No passages available. Please contact the admin.';
+        return;
+      }
+      let validPassages = 0;
+      passages.forEach((passage, index) => {
+        if (passage.title && passage.content) {
+          const option = document.createElement('option');
+          option.value = index.toString();
+          option.textContent = passage.title || `Passage ${index + 1}`;
+          passageSelector.appendChild(option);
+          validPassages++;
+        }
+      });
+      if (validPassages === 0) {
+        passageSelector.innerHTML += '<option value="" disabled>No valid passages available</option>';
+        sampleText.textContent = 'No valid passages available. Please contact the admin.';
+        return;
+      }
+      if (passages.length > 0) {
+        passageSelector.value = '0';
+        displayPassage();
+      }
+    }
+    function calculateWordsPerLine() {
+      const containerWidth = sampleTextContainer.clientWidth;
+      const tempSpan = document.createElement('span');
+      tempSpan.style.fontSize = '18px';
+      tempSpan.style.fontFamily = "'Times New Roman', Times, serif";
+      tempSpan.style.visibility = 'hidden';
+      tempSpan.textContent = passageWords.join(' ');
+      sampleText.appendChild(tempSpan);
+      const words = passageWords;
+      let currentLineWidth = 0;
+      let wordCount = 0;
+      let totalWords = 0;
+      const lineHeight = 28;
+      const containerHeight = sampleTextContainer.clientHeight;
+      words.forEach(word => {
+        const wordSpan = document.createElement('span');
+        wordSpan.className = 'word';
+        wordSpan.textContent = word + ' ';
+        tempSpan.appendChild(wordSpan);
+        const wordWidth = wordSpan.offsetWidth;
+        if (currentLineWidth + wordWidth > containerWidth - 20) {
+          totalWords += wordCount;
+          wordCount = 0;
+          currentLineWidth = 0;
+        }
+        currentLineWidth += wordWidth;
+        wordCount++;
+      });
+      totalWords += wordCount;
+      wordsPerLine = totalWords / (tempSpan.offsetHeight / lineHeight) || 1;
+      wordsPerLine = Math.floor(wordsPerLine);
+      tempSpan.remove();
+    }
+    function displayPassage() {
+      const selectedPassageIndex = passageSelector.value;
+      const passage = passages[parseInt(selectedPassageIndex)];
+      if (passage && passage.title && passage.content) {
+        passageWords = passage.content.trim().split(/\s+/);
+        sampleText.innerHTML = '';
+        wordElements = [];
+        passageWords.forEach((word, index) => {
+          const wordSpan = document.createElement('span');
+          wordSpan.className = 'word';
+          wordSpan.innerHTML = word.split('').map(char => `<span>${sanitizeInput(char)}</span>`).join('');
+          if (settings.mode === 'Screen Typing' && index === currentWordIndex) wordSpan.classList.add('current-word');
+          sampleText.appendChild(wordSpan);
+          sampleText.appendChild(document.createTextNode(' '));
+          wordElements.push(wordSpan);
+        });
+        calculateWordsPerLine();
+      } else if (passages.length > 0 && passages[0].title && passages[0].content) {
+        passageSelector.value = '0';
+        passageWords = passages[0].content.trim().split(/\s+/);
+        sampleText.innerHTML = '';
+        wordElements = [];
+        passageWords.forEach((word, index) => {
+          const wordSpan = document.createElement('span');
+          wordSpan.className = 'word';
+          wordSpan.innerHTML = word.split('').map(char => `<span>${sanitizeInput(char)}</span>`).join('');
+          if (settings.mode === 'Screen Typing' && index === currentWordIndex) wordSpan.classList.add('current-word');
+          sampleText.appendChild(wordSpan);
+          sampleText.appendChild(document.createTextNode(' '));
+          wordElements.push(wordSpan);
+        });
+        calculateWordsPerLine();
+      } else {
+        sampleText.textContent = 'No passages available. Please contact the admin.';
+        passageWords = [];
+        wordElements = [];
+      }
+    }
+    function updateWordHighlight() {
+      if (settings.mode !== 'Screen Typing') return;
+      wordElements.forEach((word, index) => {
+        word.classList.remove('current-word');
+        if (index === currentWordIndex) word.classList.add('current-word');
+      });
+      const lineNumber = Math.floor(currentWordIndex / wordsPerLine);
+      if (lineNumber > currentLine) {
+        currentLine = lineNumber;
+        const lineHeight = 28;
+        const containerHeight = sampleTextContainer.clientHeight;
+        const contentHeight = sampleText.offsetHeight;
+        const maxScroll = contentHeight - containerHeight;
+        if (sampleTextContainer.scrollTop < maxScroll) sampleTextContainer.scrollTop += lineHeight;
+      }
+    }
+    function updateLetterHighlight() {
+      if (settings.mode !== 'Screen Typing') return;
+      const typedText = typingArea.value;
+      const typedWordsCurrent = typedText.trim().split(/\s+/);
+      wordElements.forEach((word, wordIndex) => {
+        const chars = word.querySelectorAll('span');
+        chars.forEach(char => char.classList.remove('correct-char', 'incorrect-char'));
+      });
+      for (let wordIndex = 0; wordIndex <= currentWordIndex; wordIndex++) {
+        const wordElement = wordElements[wordIndex];
+        if (!wordElement) continue;
+        const chars = wordElement.querySelectorAll('span');
+        const typedWord = wordIndex < typedWordsCurrent.length ? typedWordsCurrent[wordIndex] : '';
+        const expectedWord = passageWords[wordIndex] || '';
+        const highlights = getCharacterHighlights(expectedWord, typedWord);
+        chars.forEach((char, charIndex) => {
+          if (charIndex < highlights.length) {
+            const highlight = highlights[charIndex];
+            if (highlight.status === 'correct') char.classList.add('correct-char');
+            else char.classList.add('incorrect-char');
+          }
+        });
+      }
+    }
+    function calculateResults() {
+      const elapsedTimeSeconds = startTime ? (Date.now() - startTime) / 1000 : 0;
+      const elapsedTimeMinutes = Math.max(elapsedTimeSeconds / 60, 0.0167);
+      const typedText = normalizeQuotes(typingArea.value);
+      totalChars = typedText.length;
+      correctChars = 0;
+      const typedWordsCurrent = typedText.trim().split(/\s+/);
+      const expectedText = normalizeQuotes(passageWords.slice(0, typedWordsCurrent.length).join(' '));
+      let punctuationMistakes = 0;
+      for (let i = 0; i < typedText.length; i++) {
+        if (i < expectedText.length) {
+          if (typedText[i] === expectedText[i]) correctChars++;
+          else if (isPunctuation(expectedText[i]) || isPunctuation(typedText[i])) punctuationMistakes++;
+        } else if (isPunctuation(typedText[i])) punctuationMistakes++;
+      }
+      for (let i = typedText.length; i < expectedText.length; i++) {
+        if (isPunctuation(expectedText[i])) punctuationMistakes++;
+      }
+      const nonPunctuationMistakes = (totalChars - correctChars) - punctuationMistakes;
+      mistakes = nonPunctuationMistakes + (punctuationMistakes * 0.5);
+      const grossWords = totalChars / 5;
+      const grossWpm = grossWords / elapsedTimeMinutes;
+      const netWords = correctChars / 5;
+      const netWpm = netWords / elapsedTimeMinutes;
+      const accuracyPercent = totalChars > 0 ? Math.min(100, (correctChars / totalChars) * 100) : 0;
+      requestAnimationFrame(() => {
+        grossSpeed.textContent = Math.round(grossWpm);
+        netSpeed.textContent = Math.round(netWpm);
+        accuracy.textContent = Math.round(accuracyPercent);
+        mistakesDisplay.textContent = mistakes.toFixed(1);
+        totalWords.textContent = typedWords.length;
+        correctWords.textContent = correctWordsCount;
+        incorrectWords.textContent = incorrectWordsCount;
+      });
+    }
+    function generateFeedback() {
+      const grossWpm = parseInt(grossSpeed.textContent) || 0;
+      const netWpm = parseInt(netSpeed.textContent) || 0;
+      const accuracyPercent = parseInt(accuracy.textContent) || 0;
+      let feedback = '';
+      if (accuracyPercent < 70) {
+        feedback += 'Pehle accuracy par focus karo, phir speed apne aap badhegi.';
+      } else if (accuracyPercent < 90) {
+        feedback += 'Achhi accuracy hai, thodi aur improve karo!';
+      } else {
+        feedback += 'Accuracy toh shandaar hai! Ab speed par dhyan do.';
+      }
+      if (accuracyPercent >= 70) {
+        if (grossWpm === 0) {
+          feedback += ' Typing start karo—practice se hi progress hogi!';
+        } else if (grossWpm <= 19) {
+          feedback += ' Shuruaat ho chuki hai, ab roz thoda practice karo!';
+        } else if (grossWpm <= 29) {
+          feedback += ' Achhi progress hai, lekin 35 WPM tak pahunchne ke liye lagataar typing karo!';
+        } else if (grossWpm <= 34) {
+          feedback += ' Bas thoda aur push karo, 35 WPM bilkul paas hai!';
+        } else if (grossWpm <= 44) {
+          feedback += ' Great job! Aapki typing speed government standards ke kareeb hai!';
+        } else if (grossWpm <= 59) {
+          feedback += ' Bahut badhiya! Aap pro level ke kareeb ho!';
+        } else {
+          feedback += ' Excellent speed! Aap typing master banne wale ho!';
+        }
+        if (netWpm < grossWpm * 0.8) {
+          feedback += ' Lekin thoda consistency laao, net speed aur badh sakti hai!';
+        }
+      }
+      if (accuracyPercent < 80) {
+        feedback += 'Accuracy below 80%! You need to improve to qualify for SSC CHSL.';
+      }
+      feedbackText.innerHTML = `<span>${sanitizeInput(feedback)}</span>`;
+      feedbackContainer.classList.add('show');
+    }
+    function submitTest() {
+      clearInterval(timerInterval);
+      isRunning = false;
+      typingArea.disabled = true;
+      startButton.disabled = false;
+      pauseButton.disabled = true;
+      restartButton.disabled = false;
+      submitButton.disabled = true;
+      pauseButton.textContent = 'Pause';
+      calculateResults();
+      generateFeedback();
+      currentWordIndex = 0;
+      currentLine = 0;
+      typedWords = [];
+      totalChars = 0;
+      correctChars = 0;
+      mistakes = 0;
+      correctWordsCount = 0;
+      incorrectWordsCount = 0;
+      sampleTextContainer.scrollTop = 0;
+      displayPassage();
+      typingArea.value = '';
+    }
+    function startTimer() {
+      if (!isRunning) {
+        if (passages.length === 0 || !passages.some(p => p.title && p.content)) {
+          alert('No passages available. Please contact the admin.');
+          return;
+        }
+        isRunning = true;
+        startTime = Date.now();
+        typingArea.disabled = false;
+        typingArea.focus();
+        startButton.disabled = true;
+        pauseButton.disabled = false;
+        restartButton.disabled = false;
+        submitButton.disabled = false;
+        timeLeft = parseInt(timerDurationSelector.value) || 900;
+        timerDisplay.textContent = formatTime(timeLeft);
+        timerInterval = setInterval(() => {
+          timeLeft--;
+          timerDisplay.textContent = formatTime(timeLeft);
+          timerDisplay.classList.toggle('low-time', timeLeft <= 30);
+          if (timeLeft <= 0) submitTest();
+        }, 1000);
+      }
+    }
+    function pauseTimer() {
+      if (isRunning) {
+        clearInterval(timerInterval);
+        isRunning = false;
+        typingArea.disabled = true;
+        pauseButton.textContent = 'Resume';
+      } else {
+        startTimer();
+        pauseButton.textContent = 'Pause';
+      }
+    }
+    function restartTest() {
+      clearInterval(timerInterval);
+      isRunning = false;
+      startTime = null;
+      typingArea.disabled = true;
+      typingArea.value = '';
+      currentWordIndex = 0;
+      currentLine = 0;
+      typedWords = [];
+      totalChars = 0;
+      correctChars = 0;
+      mistakes = 0;
+      correctWordsCount = 0;
+      incorrectWordsCount = 0;
+      timeLeft = parseInt(timerDurationSelector.value) || 900;
+      timerDisplay.textContent = formatTime(timeLeft);
+      timerDisplay.classList.remove('low-time');
+      startButton.disabled = false;
+      pauseButton.disabled = true;
+      restartButton.disabled = true;
+      submitButton.disabled = true;
+      pauseButton.textContent = 'Pause';
+      grossSpeed.textContent = '0';
+      netSpeed.textContent = '0';
+      accuracy.textContent = '0';
+      mistakesDisplay.textContent = '0';
+      totalWords.textContent = '0';
+      correctWords.textContent = '0';
+      incorrectWords.textContent = '0';
+      feedbackContainer.classList.remove('show');
+      feedbackText.innerHTML = '';
+      sampleTextContainer.scrollTop = 0;
+      settings.mode = examModeSelector.value = 'Paper Typing';
+      displayPassage();
+    }
+    passageSelector.addEventListener('change', () => {
+      currentWordIndex = 0;
+      currentLine = 0;
+      typedWords = [];
+      totalChars = 0;
+      correctChars = 0;
+      mistakes = 0;
+      correctWordsCount = 0;
+      incorrectWordsCount = 0;
+      typingArea.value = '';
+      sampleTextContainer.scrollTop = 0;
+      displayPassage();
+      if (!isRunning) restartTest();
+    });
+    examModeSelector.addEventListener('change', () => {
+      settings.mode = examModeSelector.value;
+      displayPassage();
+      if (settings.mode === 'Screen Typing') updateLetterHighlight();
+    });
+    timerDurationSelector.addEventListener('change', () => {
+      timeLeft = parseInt(timerDurationSelector.value) || 900;
+      timerDisplay.textContent = formatTime(timeLeft);
+      if (!isRunning) restartTest();
+    });
+    startButton.addEventListener('click', startTimer);
+    pauseButton.addEventListener('click', pauseTimer);
+    restartButton.addEventListener('click', restartTest);
+    submitButton.addEventListener('click', submitTest);
+    sampleTextContainer.addEventListener('click', () => {
+      if (!isRunning) startTimer();
+    });
+    typingArea.addEventListener('click', () => {
+      if (!isRunning && !typingArea.disabled) startTimer();
+    });
+    const handleInput = debounce(() => {
+      if (!isRunning) return;
+      const typedText = normalizeQuotes(typingArea.value);
+      const words = typedText.trim().split(/\s+/);
+      const currentWord = words[currentWordIndex] || '';
+      
+      // Update typed words array
+      typedWords = words.slice(0, currentWordIndex);
+      
+      // Update character counts
+      totalChars = typedText.length;
+      correctChars = 0;
+      const expectedText = normalizeQuotes(passageWords.slice(0, words.length).join(' '));
+
+      for (let i = 0; i < typedText.length; i++) {
+        if (i < expectedText.length && typedText[i] === expectedText[i]) {
+          correctChars++;
+        }
+      }
+
+      updateLetterHighlight();
+      calculateResults();
+    }, 50);
+    typingArea.addEventListener('input', handleInput);
+    typingArea.addEventListener('keydown', (e) => {
+      if (!isRunning) return;
+
+      if (e.key === ' ') {
+        const typedText = typingArea.value;
+        const lastChar = typedText[typedText.length - 1];
+        
+        // Don't allow multiple spaces
+        if (lastChar === ' ') {
+          e.preventDefault();
+          return;
+        }
+
+        const currentWord = typedText.trim().split(/\s+/).pop() || '';
+        if (!currentWord) {
+          e.preventDefault();
+          return;
+        }
+
+        // Allow natural space behavior
+        if (currentWordIndex < passageWords.length) {
+          const expectedWord = passageWords[currentWordIndex];
+          if (currentWord === expectedWord) {
+            correctWordsCount++;
+          } else {
+            incorrectWordsCount++;
+          }
+          currentWordIndex++;
+          updateWordHighlight();
+          updateLetterHighlight();
+          calculateResults();
+
+          if (currentWordIndex >= passageWords.length) {
+            submitTest();
+          }
+        }
+      } else if (e.key === 'Backspace') {
+        const typedText = typingArea.value;
+        const cursorPosition = typingArea.selectionStart;
+        
+        // If cursor is at start of a word after a space
+        if (cursorPosition > 0 && typedText[cursorPosition - 1] === ' ' && currentWordIndex > 0) {
+          currentWordIndex--;
+          if (typedWords.length > 0) {
+            const lastWord = typedWords[typedWords.length - 1];
+            if (lastWord === passageWords[currentWordIndex]) {
+              correctWordsCount--;
+            } else {
+              incorrectWordsCount--;
+            }
+            typedWords.pop();
+          }
+          updateWordHighlight();
+          updateLetterHighlight();
+          calculateResults();
+        }
+      }
+    });
+    sampleTextContainer.addEventListener('keydown', (e) => {
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) e.preventDefault();
+    });
+    feedbackCancel.addEventListener('click', () => {
+      feedbackContainer.classList.remove('show');
+      feedbackText.innerHTML = '';
+    });
+    typingArea.addEventListener('paste', (e) => {
+      e.preventDefault();
+      alert('Pasting text is disabled.');
+    });
+    typingArea.addEventListener('cut', (e) => e.preventDefault());
+    typingArea.addEventListener('copy', (e) => e.preventDefault());
+    sampleText.addEventListener('copy', (e) => {
+      e.preventDefault();
+      alert('Copying passage text is disabled.');
+    });
+    sampleText.addEventListener('contextmenu', (e) => e.preventDefault());
+    document.addEventListener('DOMContentLoaded', () => {
+      fetch('header.html')
+        .then(response => { if (!response.ok) throw new Error('Header fetch failed: ' + response.status); return response.text(); })
+        .then(data => { document.getElementById('header').innerHTML = data; initializeNavigation(); })
+        .catch(error => { console.error('Error loading header:', error); alert('Failed to load header. Please check files or server.'); });
+      fetch('footer.html')
+        .then(response => { if (!response.ok) throw new Error('Footer fetch failed: ' + response.status); return response.text(); })
+        .then(data => { document.getElementById('footer').innerHTML = data; })
+        .catch(error => { console.error('Error loading footer:', error); alert('Failed to load footer. Please check files or server.'); });
+      timerDisplay.textContent = formatTime(timeLeft);
+      populatePassageSelector();
+      alignResultSection();
+    });
+    window.addEventListener('resize', alignResultSection);
+  </script>
+  <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'943b368e4f5644eb',t:'MTc0NzkwNTM2OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+</body>
+</html>

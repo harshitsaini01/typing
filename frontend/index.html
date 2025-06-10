@@ -1,0 +1,982 @@
+<script type="text/javascript">
+    var gk_isXlsx = false;
+    var gk_xlsxFileLookup = {};
+    var gk_fileData = {};
+    function filledCell(cell) {
+        return cell !== '' && cell != null;
+    }
+    function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                    row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                    headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+    }
+</script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Free typing test practice for SSC, RRB, CPCT, and other government exams in Hindi & English. Improve speed and accuracy with real exam patterns.">
+    <meta name="keywords" content="typing test, SSC typing, RRB typing, CPCT typing, government exam preparation, Hindi typing, English typing">
+    <title>TypingHub - Ace SSC & Railway Typing Tests</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Serif:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" loading="lazy">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+        .main-content {
+            flex: 1;
+            padding: 0;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+        }
+        .container {
+            width: 100vw;
+            max-width: none;
+            margin: 0;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .panel {
+            background: #fff;
+            padding: 0;
+            min-height: 100vh;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+        nav {
+            background: #fff;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+        }
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .nav-brand img {
+            width: 70px;
+            height: auto;
+        }
+        .nav-brand a {
+            font-family: 'Roboto Serif', serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: #1976d2;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .nav-brand a:hover {
+            color: #40c4ff;
+        }
+        .nav-links {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .nav-links a, .nav-links .dropbtn {
+            color: #333;
+            text-decoration: none;
+            font-size: 16px;
+            padding: 8px 15px;
+            border-radius: 4px;
+            font-weight: 400;
+            transition: background-color 0.3s;
+            font-family: 'Times New Roman', Times, serif;
+        }
+        .nav-links a:hover, .nav-links .dropbtn:hover {
+            background-color: #FFFF00;
+            color: #000;
+        }
+        .nav-links a.active {
+            background-color: #1976d2;
+            color: #fff;
+        }
+        .dropdown {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background: #fff;
+            min-width: 200px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 4px;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+            padding: 5px 0;
+        }
+        .dropdown-content a {
+            color: #333;
+            padding: 10px 0;
+            text-decoration: none;
+            display: block;
+            font-size: 14px;
+            font-family: 'Times New Roman', Times, serif;
+            text-align: center;
+        }
+        .dropdown-content a:hover {
+            background-color: #FFFF00;
+            color: #000;
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        .hamburger {
+            display: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #333;
+        }
+        .hero-section {
+            background: #e3f2fd;
+            padding: 30px 0;
+            text-align: center;
+            border-bottom: 2px solid #1976d2;
+            margin-bottom: 20px;
+            width: 100vw;
+            max-width: none;
+        }
+        .hero-content {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        .hero-content h1 {
+            font-family: 'Roboto Serif', serif;
+            font-size: 32px;
+            font-weight: 700;
+            color: #1a2a44;
+            margin-bottom: 15px;
+        }
+        .hero-content p {
+            font-size: 18px;
+            color: #555;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        .hero-content .btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: 500;
+            width: 200px;
+            margin: 10px;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: 4px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #1976d2, #0d47a1);
+            color: #fff;
+            text-decoration: none;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #1565c0, #0d47a1);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+            transform: scale(1.08);
+        }
+        h1, h2, h3 {
+            font-family: 'Roboto Serif', serif;
+            color: #1a2a44;
+            font-weight: 700;
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+        h2 {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+        h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        p {
+            color: #555;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        .home-content {
+            width: 100vw;
+            max-width: none;
+            margin: 0;
+            margin-bottom: 15px;
+            padding: 10px 0;
+        }
+        .home-main {
+            background: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            padding: 20px;
+            border-radius: 8px;
+            min-height: auto;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .home-main p {
+            margin-bottom: 15px;
+        }
+        .highlight-sections {
+            width: 100vw;
+            max-width: none;
+            margin: 20px 0;
+            padding: 10px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .feature-list, .exam-list, .tips-list, .blog-list {
+            list-style: none;
+            padding: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 12px;
+            width: 100%;
+            max-width: 1200px;
+            margin: 10px auto;
+        }
+        .feature-list li, .exam-list li, .tips-list li {
+            background: #fff;
+            padding: 15px;
+            border-radius: 6px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+        }
+        .blog-list {
+            grid-template-columns: 1fr;
+            gap: 8px;
+            margin: 10px auto;
+        }
+        .blog-list li {
+            background: #e3f2fd;
+            border: 1px solid #1976d2;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .blog-list li:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .feature-list li i, .exam-list li i, .tips-list li i, .blog-list li i {
+            color: #1976d2;
+            margin-right: 10px;
+            font-size: 18px;
+        }
+        .exam-list li .exam-links {
+            margin-left: 5px;
+        }
+        .exam-list li .exam-links a {
+            color: #333;
+            text-decoration: none;
+            font-size: 14px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+        .exam-list li .exam-links a:hover {
+            background: #FFFF00;
+            color: #000;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+            display: inline-flex;
+            align-items: center;
+            text-decoration: none;
+            width: 150px;
+            justify-content: center;
+        }
+        .certificate-section, .improve-skills-section, .course-ad-section {
+            background: #e3f2fd;
+            padding: 15px;
+            border: 2px solid #1976d2;
+            border-radius: 6px;
+            text-align: center;
+            width: 100%;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin: 0 auto;
+        }
+        .certificate-section .inner, .improve-skills-section .inner, .course-ad-section .inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        .certificate-section .btn, .improve-skills-section .btn, .course-ad-section .btn {
+            width: 200px;
+        }
+        .course-ad-section {
+            position: relative;
+            background: linear-gradient(135deg, #ff9800, #f57c00);
+            color: #fff;
+            border: 2px solid #1976d2;
+            overflow: hidden;
+            transition: transform 0.3s;
+            animation: slideIn 0.6s ease-in;
+        }
+        .course-ad-section:hover {
+            transform: scale(1.05);
+        }
+        .course-ad-section::before {
+            content: '\f11c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 120px;
+            color: rgba(255, 255, 255, 0.1);
+            z-index: 0;
+        }
+        .course-ad-section::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%);
+            animation: pulse 3s infinite;
+            z-index: 0;
+        }
+        .course-ad-section h2 {
+            color: #fff;
+            font-size: 24px;
+            font-weight: 700;
+            animation: fadeIn 1s ease-in;
+            position: relative;
+            z-index: 1;
+        }
+        .course-ad-section p {
+            color: #fff;
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 15px;
+            animation: fadeIn 1.2s ease-in;
+            position: relative;
+            z-index: 1;
+        }
+        .course-ad-section p span {
+            font-style: italic;
+            font-weight: bold;
+        }
+        .course-ad-section .btn {
+            background: #fff;
+            color: #ff9800;
+            animation: fadeIn 1.4s ease-in;
+            position: relative;
+            z-index: 1;
+        }
+        .course-ad-section .btn:hover {
+            background: #1976d2;
+            color: #fff;
+            transform: scale(1.08);
+        }
+        .highlight {
+            background: #e3f2fd;
+            border: 2px solid #1976d2;
+            padding: 20px;
+            border-radius: 6px;
+            width: 100vw;
+            max-width: none;
+        }
+        .panel-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 10px 0;
+            width: 100vw;
+            max-width: none;
+            margin: 0 auto;
+            justify-content: center;
+        }
+        .panel-item {
+            flex: 1;
+            min-width: 250px;
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 220px;
+            max-width: 280px;
+        }
+        .panel-item:hover {
+            transform: translateY(-5px);
+        }
+        .panel-item i {
+            font-size: 40px;
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+        .panel-item p {
+            flex-grow: 1;
+            margin-bottom: 15px;
+        }
+        #home-page {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            width: 100%;
+        }
+        .sample-text {
+            user-select: none;
+        }
+        .typing-area, textarea {
+            user-select: text;
+        }
+        footer {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            color: #333;
+            padding: 45px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 20px;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+            border-top: 1px solid #1976d2;
+            width: 100vw;
+            max-width: none;
+        }
+        .footer-middle {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            flex: 2;
+        }
+        footer h3 {
+            color: #1976d2;
+            font-size: 18px;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+        footer a {
+            color: #333;
+            text-decoration: none;
+            font-size: 16px;
+            display: block;
+            margin-bottom: 10px;
+            transition: color 0.3s;
+        }
+        footer a:hover {
+            color: #1565c0;
+        }
+        footer p {
+            color: #333;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        .footer-copyright {
+            text-align: center;
+            width: 100%;
+            color: #333;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        .footer-section {
+            flex: 1;
+            min-width: 200px;
+            padding-right: 20px;
+            border-right: 1px solid rgba(0,0,0,0.1);
+        }
+        .footer-section:last-child {
+            border-right: none;
+        }
+        .footer-section.logo-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-right: none;
+        }
+        .footer-section.logo-section img {
+            width: 80px;
+            height: auto;
+        }
+        .footer-section.social-contacts a {
+            display: inline-block;
+            margin-right: 12px;
+            font-size: 22px;
+            color: #333;
+            transition: transform 0.2s, color 0.2s;
+        }
+        .footer-section.social-contacts a:hover {
+            transform: scale(1.2);
+            color: #1976d2;
+        }
+        .footer-section.social-contacts p.email {
+            color: #1976d2;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes pulse {
+            0% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.1; transform: scale(1.2); }
+            100% { opacity: 0.3; transform: scale(1); }
+        }
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 0;
+            }
+            .panel {
+                padding: 0;
+            }
+            .hero-section {
+                padding: 20px 0;
+                margin-bottom: 15px;
+            }
+            .hero-content h1 {
+                font-size: 24px;
+            }
+            .hero-content p {
+                font-size: 16px;
+            }
+            .nav-brand img {
+                width: 35px;
+            }
+            .nav-brand a {
+                font-size: 18px;
+            }
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                gap: 8px;
+                width: 100%;
+                align-items: stretch;
+            }
+            .nav-links.active {
+                display: flex;
+            }
+            .hamburger {
+                display: block;
+            }
+            .nav-links a, .nav-links .dropbtn {
+                padding: 8px;
+                text-align: center;
+            }
+            .dropdown-content {
+                position: static;
+                width: 100%;
+                box-shadow: none;
+                transform: none;
+                text-align: center;
+            }
+            .dropdown-content a {
+                padding: 10px;
+            }
+            .home-content {
+                margin-bottom: 10px;
+                padding: 5px 0;
+            }
+            .home-main {
+                padding: 15px;
+            }
+            .btn {
+                padding: 8px 15px;
+                font-size: 14px;
+                width: 100%;
+            }
+            .hero-content .btn {
+                width: 100%;
+                max-width: 300px;
+                margin: 5px auto;
+                padding: 10px 20px;
+                font-size: 16px;
+            }
+            .feature-list, .exam-list, .tips-list {
+                gap: 8px;
+                padding: 0 5px;
+            }
+            .panel-container {
+                padding: 5px;
+                gap: 10px;
+            }
+            .panel-item {
+                min-height: 200px;
+                padding: 12px;
+            }
+            .certificate-section, .improve-skills-section, .course-ad-section {
+                padding: 12px;
+            }
+            .course-ad-section h2 {
+                font-size: 20px;
+            }
+            .course-ad-section p {
+                font-size: 14px;
+            }
+            .course-ad-section .btn {
+                font-size: 14px;
+                padding: 8px 15px;
+                width: 180px;
+            }
+            footer {
+                flex-direction: column;
+                text-align: center;
+                padding: 30px;
+            }
+            .footer-middle {
+                flex-direction: column;
+                gap: 20px;
+            }
+            .footer-section {
+                padding-right: 0;
+                border-right: none;
+            }
+            .footer-section.social-contacts a {
+                display: inline-block;
+                margin: 5px;
+            }
+            .footer-section.logo-section img {
+                width: 40px;
+            }
+        }
+        @media (max-width: 600px) {
+            nav {
+                flex-direction: column;
+                gap: 10px;
+                padding: 10px;
+            }
+            .hero-content h1 {
+                font-size: 20px;
+            }
+            .hero-content p {
+                font-size: 14px;
+            }
+            .hero-content .btn {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+            .certificate-section h2, .improve-skills-section h2, .course-ad-section h2 {
+                font-size: 18px;
+            }
+            .course-ad-section p {
+                font-size: 13px;
+            }
+            .course-ad-section .btn {
+                font-size: 13px;
+                padding: 8px 12px;
+                width: 160px;
+            }
+        }
+        @media (max-width: 400px) {
+            .nav-brand a {
+                font-size: 16px;
+            }
+            .hero-content h1 {
+                font-size: 18px;
+            }
+            .hero-content p {
+                font-size: 12px;
+            }
+            .btn {
+                font-size: 12px;
+                padding: 6px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <script type="text/javascript" defer>
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+            return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+            if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+                try {
+                    var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                    var firstSheetName = workbook.SheetNames[0];
+                    var worksheet = workbook.Sheets[firstSheetName];
+                    var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                    var filteredData = jsonData.filter(row => row.some(filledCell));
+                    var headerRowIndex = filteredData.findIndex((row, index) =>
+                        row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                    );
+                    if (headerRowIndex === -1 || headerRowIndex > 25) {
+                        headerRowIndex = 0;
+                    }
+                    var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex));
+                    csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                    return csv;
+                } catch (e) {
+                    console.error('Error processing XLSX file:', e);
+                    return "";
+                }
+            }
+            return gk_fileData[filename] || "";
+        }
+    </script>
+    <div id="header"></div>
+    <main class="main-content">
+        <div class="container">
+            <div class="panel">
+                <div id="home-page">
+                    <div class="hero-section highlight">
+                        <div class="hero-content">
+                            <h1>Free Typing Test Practice for Government Exams</h1>
+                            <p>Practice for CPCT, SSC, RRB, Police, and other govt exams — Hindi & English.</p>
+                            <div style="display: flex; justify-content: center; gap: 20px;">
+                                <a href="typing-test.html" class="btn btn-primary">Start Now – No Signup Needed</a>
+                                <a href="exam-wise-test.html" class="btn btn-primary">Explore Exam Wise Tests</a>
+                            </div>
+                        </div>
+                    </div>
+                    <section class="panel-container">
+                        <div class="panel-item">
+                            <i class="fas fa-keyboard"></i>
+                            <h3>Typing Test</h3>
+                            <p>Practice with our standard typing tests to improve speed and accuracy.</p>
+                            <a href="typing-test.html" class="btn btn-primary">Take Test</a>
+                        </div>
+                        <div class="panel-item">
+                            <i class="fas fa-graduation-cap"></i>
+                            <h3>Exam Wise Test</h3>
+                            <p>Prepare for specific exams with tailored typing tests.</p>
+                            <a href="exam-wise-test.html" class="btn btn-primary">Explore Exams</a>
+                        </div>
+                        <div class="panel-item">
+                            <i class="fas fa-edit"></i>
+                            <h3>Advance Mode</h3>
+                            <p>Create your own typing tests for customized practice.</p>
+                            <a href="create-test.html" class="btn btn-primary">Create Test</a>
+                        </div>
+                        <div class="panel-item">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                            <h3>Typing Course</h3>
+                            <p>Join our course to learn typing techniques from experts.</p>
+                            <a href="typing-course-landing.html" class="btn btn-primary">Join Course</a>
+                        </div>
+                    </section>
+                    <div class="home-content">
+                        <div class="home-main">
+                            <h2>Why Use Our Typing Test?</h2>
+                            <p>TypingHub offers an exam-like environment to prepare for SSC, RRB, CPCT, and other government typing tests. Our platform mimics the SSC-NIC software used in exams, providing real-time feedback on speed, accuracy, and errors to help you qualify for posts like Tax Assistant, LDC, and Junior Clerk.</p>
+                            <ul class="feature-list">
+                                <li><i class="fas fa-keyboard"></i> Real Exam Pattern Based</li>
+                                <li><i class="fas fa-language"></i> Hindi & English Typing</li>
+                                <li><i class="fas fa-chart-line"></i> Instant Speed & Accuracy Report</li>
+                                <li><i class="fas fa-certificate"></i> Free Certificate Option</li>
+                                <li><i class="fas fa-mobile-alt"></i> Mobile Friendly Interface</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="home-content">
+                        <div class="home-main">
+                            <h2>Government Typing Test Overview</h2>
+                            <p>Typing tests are a crucial part of SSC and Railway recruitment for clerical and data entry posts. Below are key details to help you prepare effectively.</p>
+                            <ul class="exam-list">
+                                <li><i class="fas fa-check-circle"></i> SSC CGL/CHSL: 2000 key depressions in 15 min (35 WPM English, 30 WPM Hindi)</li>
+                                <li><i class="fas fa-check-circle"></i> RRB NTPC: 30-35 WPM, Hindi typing in Devlys 010 or Mangal font</li>
+                                <li><i class="fas fa-check-circle"></i> Accuracy Matters: Up to 5% errors allowed; practice for 95%+ accuracy</li>
+                                <li><i class="fas fa-check-circle"></i> Exam Software: SSC uses NIC software; RRB tests via TCS platform</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="home-content">
+                        <div class="home-main">
+                            <h2>Preparation Tips for Typing Tests</h2>
+                            <p>Boost your typing skills with these expert tips tailored for government exams.</p>
+                            <ul class="tips-list">
+                                <li><i class="fas fa-star"></i> Practice daily with SSC/Railway mock tests to hit 35 WPM.</li>
+                                <li><i class="fas fa-star"></i> Disable backspace in custom tests to simulate real exam conditions.</li>
+                                <li><i class="fas fa-star"></i> Learn Hindi fonts (Krutidev/Mangal) for RRB and SSC Hindi tests.</li>
+                                <li><i class="fas fa-star"></i> Focus on accuracy first, then speed, to minimize errors.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="highlight-sections">
+                        <div class="certificate-section">
+                            <div class="inner">
+                                <h2>Get Free Certificate</h2>
+                                <p>Complete 3 tests today and download a PDF certificate with your name & typing speed!</p>
+                                <a href="certificate.html" class="btn btn-primary">Start Now – Track My Progress</a>
+                            </div>
+                        </div>
+                        <div class="course-ad-section">
+                            <div class="inner">
+                                <h2>Join Our Typing Course</h2>
+                                <p>Master typing for SSC, RRB, and CPCT exams with our structured course. Start at just <span>₹149</span>!</p>
+                                <a href="typing-course-landing.html" class="btn btn-primary"><i class="fas fa-graduation-cap"></i> Enroll Now</a>
+                            </div>
+                        </div>
+                        <div class="improve-skills-section">
+                            <div class="inner">
+                                <h2>Improve Your Typing Skills</h2>
+                                <ul class="blog-list">
+                                    <li><i class="fas fa-book"></i> <a href="blog.html">5 Tips to Boost Typing Speed</a></li>
+                                    <li><i class="fas fa-book"></i> <a href="blog.html">CPCT Typing Test Pattern Explained</a></li>
+                                    <li><i class="fas fa-book"></i> <a href="blog.html">Common Mistakes in Hindi Typing</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <div id="footer"></div>
+    <!-- Recommendation: Add cache headers for static assets (e.g., favicon.png, Main LOGO.png) to improve performance -->
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js" defer></script>
+    <script defer>
+        // Load header
+        fetch('header.html')
+            .then(response => {
+                console.log('Fetching header.html... Status:', response.status);
+                if (!response.ok) throw new Error('Failed to load header: ' + response.status);
+                return response.text();
+            })
+            .then(data => {
+                console.log('Header loaded successfully');
+                document.getElementById('header').innerHTML = data;
+                initializeNavigation();
+                initializeHamburger();
+            })
+            .catch(error => {
+                console.error('Error loading header:', error);
+            });
+
+        // Load footer
+        fetch('footer.html')
+            .then(response => {
+                console.log('Fetching footer.html... Status:', response.status);
+                if (!response.ok) throw new Error('Failed to load footer: ' + response.status);
+                return response.text();
+            })
+            .then(data => {
+                console.log('Footer loaded successfully');
+                document.getElementById('footer').innerHTML = data;
+            })
+            .catch(error => {
+                console.error('Error loading footer:', error);
+            });
+
+        // Navigation initialization
+        function initializeNavigation() {
+            const navLinks = document.querySelectorAll('.nav-links a');
+            navLinks.forEach(link => {
+                if (link.getAttribute('href') === window.location.pathname.split('/').pop()) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        }
+
+        // Hamburger menu toggle
+        function initializeHamburger() {
+            const hamburger = document.querySelector('.hamburger');
+            const navLinks = document.querySelector('.nav-links');
+            if (hamburger && navLinks) {
+                hamburger.addEventListener('click', () => {
+                    navLinks.classList.toggle('active');
+                });
+            }
+        }
+
+        // Anti-copy/paste protection
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeNavigation();
+            initializeHamburger();
+            const sampleTexts = document.querySelectorAll('.sample-text');
+            sampleTexts.forEach(text => {
+                text.addEventListener('copy', (e) => {
+                    e.preventDefault();
+                    alert('Copying passage text is disabled.');
+                });
+                text.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
+                });
+            });
+            const typingAreas = document.querySelectorAll('.typing-area, textarea');
+            typingAreas.forEach(area => {
+                area.addEventListener('paste', (e) => {
+                    e.preventDefault();
+                    alert('Pasting text is disabled. Please type the passage.');
+                });
+                area.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
+                });
+            });
+        });
+    </script>
+</body>
+</html>

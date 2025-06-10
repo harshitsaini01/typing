@@ -1,0 +1,1686 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TypingHub - Ace Your Typing for Govt Exams</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Serif:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script defer src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Times New Roman', Times, serif;
+      background: #f5f5f5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      position: relative;
+    }
+    .main-content {
+      flex: 1;
+      padding: 0;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      filter: blur(5px);
+    }
+    .container {
+      width: 100vw;
+      max-width: none;
+      margin: 0;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .panel {
+      background: #fff;
+      padding: 0;
+      min-height: 100vh;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    nav {
+      background: #fff;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      width: 100%;
+      filter: none;
+    }
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .nav-brand img {
+      width: 70px;
+      height: auto;
+    }
+    .nav-brand a {
+      font-family: 'Roboto Serif', serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: #1976d2;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    .nav-brand a:hover {
+      color: #40c4ff;
+    }
+    .nav-links {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .nav-links a, .nav-links .dropbtn {
+      color: #333;
+      text-decoration: none;
+      font-size: 16px;
+      padding: 8px 15px;
+      border-radius: 4px;
+      font-weight: 400;
+      transition: background-color 0.3s;
+      font-family: 'Times New Roman', Times, serif;
+    }
+    .nav-links a:hover, .nav-links .dropbtn:hover {
+      background-color: #FFFF00;
+      color: #000;
+    }
+    .nav-links a.active {
+      background-color: #1976d2;
+      color: #fff;
+    }
+    .dropdown {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background: #fff;
+      min-width: 200px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      border-radius: 4px;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1;
+      padding: 5px 0;
+    }
+    .dropdown-content a {
+      color: #333;
+      padding: 10px 0;
+      text-decoration: none;
+      display: block;
+      font-size: 14px;
+      font-family: 'Times New Roman', Times, serif;
+      text-align: center;
+    }
+    .dropdown-content a:hover {
+      background-color: #FFFF00;
+      color: #000;
+    }
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+    .hero-section {
+      background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+      padding: 40px 0;
+      text-align: center;
+      border-bottom: 2px solid #1976d2;
+      margin-bottom: 40px;
+      width: 100vw;
+      max-width: none;
+      position: relative;
+      overflow: hidden;
+      animation: slideIn 0.6s ease-in;
+    }
+    .hero-section::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%);
+      z-index: 0;
+    }
+    .hero-content {
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 20px;
+      position: relative;
+      z-index: 1;
+    }
+    .hero-content h1 {
+      font-family: 'Roboto Serif', serif;
+      font-size: 32px;
+      font-weight: 700;
+      color: #1a2a44;
+      margin-bottom: 15px;
+      animation: fadeIn 0.8s ease-in;
+    }
+    .hero-content p {
+      font-family: 'Times New Roman', Times, serif;
+      font-size: 18px;
+      color: #555;
+      margin-bottom: 20px;
+      line-height: 1.6;
+      animation: fadeIn 1s ease-in;
+    }
+    .hero-content .btn {
+      padding: 12px 24px;
+      font-size: 18px;
+      font-weight: 600;
+      width: 200px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #1976d2, #0d47a1);
+      color: #fff;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.3s;
+      margin: 10px;
+      display: inline-block;
+      animation: fadeIn 1.2s ease-in;
+      font-family: 'Times New Roman', Times, serif;
+    }
+    .hero-content .btn:hover {
+      transform: scale(1.08);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+    }
+    h1, h2, h3 {
+      font-family: 'Roboto Serif', serif;
+      color: #1a2a44;
+      font-weight: 700;
+    }
+    h1 {
+      font-size: 28px;
+      margin-bottom: 15px;
+    }
+    h2 {
+      font-size: 24px;
+      margin-bottom: 15px;
+    }
+    h3 {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+    p {
+      color: #555;
+      font-size: 16px;
+      line-height: 1.5;
+      font-family: 'Times New Roman', Times, serif;
+    }
+    .home-content {
+      width: 100vw;
+      max-width: none;
+      margin: 0;
+      margin-bottom: 15px;
+      padding: 20px 0;
+    }
+    .home-main {
+      background: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      padding: 25px;
+      border-radius: 8px;
+      min-height: 300px;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .home-main:hover {
+      transform: none;
+      box-shadow: none;
+    }
+    .pricing {
+      padding: 40px 0;
+      text-align: center;
+      animation: slideIn 0.6s ease-in;
+      background: linear-gradient(135deg, #f5f7fa, #e3f2fd);
+      position: relative;
+      margin: 20px auto;
+      max-width: 1200px;
+    }
+    .pricing::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%);
+      z-index: 0;
+    }
+    .pricing-wrapper {
+      display: flex;
+      flex-direction: row;
+      gap: 20px;
+      justify-content: center;
+      max-width: 1200px;
+      margin: 0 auto;
+      margin-bottom: 40px;
+      position: relative;
+      z-index: 1;
+    }
+    .pricing .plan-card, .pricing .auth-section {
+      background: #fff;
+      padding: 20px;
+      border: 2px solid transparent;
+      border-image: linear-gradient(135deg, #1976d2, #0d47a1) 1;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 360px;
+      min-height: 480px;
+      text-align: center;
+      transition: transform 0.3s, box-shadow 0.3s;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .pricing .plan-card {
+      background: rgba(245, 247, 250, 0.5);
+    }
+    .pricing .plan-card.premium {
+      background: rgba(25, 118, 210, 0.1);
+    }
+    .pricing .plan-card.highlight, .pricing .auth-section.highlight {
+      box-shadow: 0 0 12px rgba(25, 118, 210, 0.5);
+    }
+    .pricing .plan-card:hover, .pricing .auth-section:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 16px rgba(25, 118, 210, 0.3);
+    }
+    .pricing .plan-card h3 {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+    .pricing .plan-card .price {
+      font-size: 26px;
+      font-weight: bold;
+      color: #ff9800;
+      margin-bottom: 15px;
+    }
+    .pricing .plan-card ul {
+      list-style: none;
+      margin-bottom: 20px;
+      text-align: left;
+      flex-grow: 1;
+      padding: 0 10px;
+    }
+    .pricing .plan-card ul li {
+      font-size: 16px;
+      color: #555;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .pricing .plan-card ul li i {
+      color: #28a745;
+    }
+    .pricing .plan-card p.plan-desc {
+      font-size: 14px;
+      color: #666;
+      font-style: italic;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .pricing .plan-card .btn, .pricing .auth-section button {
+      width: 160px;
+      margin: 0 auto;
+      padding: 12px 24px;
+      font-size: 16px;
+      font-weight: 600;
+      background: linear-gradient(135deg, #1976d2, #0d47a1);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.3s;
+      text-decoration: none;
+      font-family: 'Times New Roman', Times, serif;
+    }
+    .pricing .plan-card .btn:hover, .pricing .auth-section button:hover {
+      transform: scale(1.08);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+    }
+    .pricing .refund-policy {
+      font-size: 14px;
+      color: #555;
+      margin-top: 20px;
+    }
+    .pricing .refund-policy a {
+      color: #1976d2;
+      text-decoration: none;
+    }
+    .pricing .refund-policy a:hover {
+      color: #1565c0;
+    }
+    .auth-section {
+      text-align: center;
+      width: 100%;
+      max-width: 360px;
+      min-height: 480px;
+    }
+    .auth-section .auth-card {
+      width: 100%;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .auth-section h2 {
+      font-size: 24px;
+      margin-bottom: 15px;
+    }
+    .auth-section form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      flex-grow: 1;
+    }
+    .auth-section .input-group {
+      position: relative;
+    }
+    .auth-section input {
+      width: 100%;
+      padding: 12px 40px;
+      font-size: 16px;
+      border-radius: 4px;
+      border: 1px solid #1976d2;
+      background: #fff;
+      color: #333;
+      transition: border-color 0.3s;
+      font-family: 'Times New Roman', Times, serif;
+    }
+    .auth-section input:focus {
+      border-color: #1976d2;
+      box-shadow: 0 0 8px rgba(25, 118, 210, 0.3);
+      outline: none;
+    }
+    .auth-section .input-group i {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #1976d2;
+      font-size: 18px;
+    }
+    .auth-section .input-group i.toggle-password {
+      left: auto;
+      right: 12px;
+      cursor: pointer;
+      color: #555;
+      transition: color 0.3s;
+    }
+    .auth-section .input-group i.toggle-password:hover {
+      color: #1976d2;
+    }
+    .auth-section .validation-feedback {
+      font-size: 14px;
+      text-align: left;
+      margin-top: 10px;
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      opacity: 0;
+      transition: opacity 0.3s ease-in;
+      font-family: 'Times New Roman', Times, serif;
+    }
+    .auth-section .validation-feedback.show {
+      display: flex;
+      opacity: 1;
+    }
+    .auth-section .validation-feedback li {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #dc3545;
+      list-style: none;
+    }
+    .auth-section .validation-feedback li.valid {
+      color: #28a745;
+    }
+    .auth-section .forgot-form, .auth-section .otp-form {
+      display: none;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .benefits-section, .success-stories, .features, .love-typinghub {
+      padding: 20px 0;
+      text-align: center;
+      animation: slideIn 0.8s ease-in;
+    }
+    .benefits-grid, .success-stories-grid, .features-grid, .love-typinghub-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .benefit-card, .success-story-card, .feature-card, .love-typinghub-card {
+      background: #fff;
+      padding: 20px;
+      border: 2px solid transparent;
+      border-image: linear-gradient(135deg, #ff5722, #2196f3) 1;
+      border-radius: 6px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      text-align: center;
+      transition: transform 0.3s, box-shadow 0.3s;
+      min-height: 200px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      animation: fadeIn 0.8s ease-in;
+      animation-fill-mode: both;
+    }
+    .benefit-card:nth-child(1), .success-story-card:nth-child(1), .feature-card:nth-child(1), .love-typinghub-card:nth-child(1) { animation-delay: 0.2s; }
+    .benefit-card:nth-child(2), .success-story-card:nth-child(2), .feature-card:nth-child(2), .love-typinghub-card:nth-child(2) { animation-delay: 0.4s; }
+    .benefit-card:nth-child(3), .success-story-card:nth-child(3), .feature-card:nth-child(3), .love-typinghub-card:nth-child(3) { animation-delay: 0.6s; }
+    .benefit-card:hover, .success-story-card:hover, .feature-card:hover, .love-typinghub-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+    }
+    .benefit-card i, .success-story-card i, .feature-card i, .love-typinghub-card i {
+      font-size: 40px;
+      color: #1976d2;
+      margin-bottom: 10px;
+    }
+    .benefit-card h3, .success-story-card h3, .feature-card h3, .love-typinghub-card h3 {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+    .benefit-card p, .success-story-card p, .feature-card p, .love-typinghub-card p {
+      font-size: 16px;
+      color: #555;
+      flex-grow: 1;
+      font-family: 'Times New Roman', Times, serif;
+    }
+    footer {
+      background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+      color: #333;
+      padding: 45px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 20px;
+      box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+      border-top: 1px solid #1976d2;
+      width: 100vw;
+      max-width: none;
+      filter: none;
+    }
+    .footer-middle {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      flex: 2;
+    }
+    footer h3 {
+      color: #1976d2;
+      font-size: 18px;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+    footer a {
+      color: #333;
+      text-decoration: none;
+      font-size: 16px;
+      display: block;
+      margin-bottom: 10px;
+      transition: color 0.3s;
+      font-family: 'Times New Roman', Times, serif;
+    }
+    footer a:hover {
+      color: #1565c0;
+    }
+    footer p {
+      color: #333;
+      font-size: 16px;
+      margin-bottom: 10px;
+      font-family: 'Times New Roman', Times, serif;
+    }
+    .footer-copyright {
+      text-align: center;
+      width: 100%;
+      color: #333;
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+    .footer-section {
+      flex: 1;
+      min-width: 200px;
+      padding-right: 20px;
+      border-right: 1px solid rgba(0,0,0,0.1);
+    }
+    .footer-section:last-child {
+      border-right: none;
+    }
+    .footer-section.logo-section {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-right: none;
+    }
+    .footer-section.logo-section img {
+      width: 80px;
+      height: auto;
+    }
+    .footer-section.social-contacts a {
+      display: inline-block;
+      margin-right: 12px;
+      font-size: 22px;
+      color: #333;
+      transition: transform 0.2s, color 0.2s;
+    }
+    .footer-section.social-contacts a:hover {
+      transform: scale(1.2);
+      color: #1976d2;
+    }
+    .footer-section.social-contacts p.email {
+      color: #1976d2;
+    }
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.3s ease-in;
+    }
+    .modal-content {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      animation: slideIn 0.3s ease-in;
+      font-family: 'Times New Roman', Times, serif;
+    }
+    .modal-content img {
+      width: 80px;
+      margin-bottom: 15px;
+    }
+    .modal-content h3 {
+      font-size: 20px;
+      margin-bottom: 10px;
+      color: #1a2a44;
+    }
+    .modal-content p {
+      font-size: 16px;
+      color: #555;
+      margin-bottom: 20px;
+    }
+    .modal-content .btn {
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 4px;
+      background: linear-gradient(135deg, #1976d2, #0d47a1);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      margin: 0 10px;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.3s;
+      font-family: 'Times New Roman', Times, serif;
+    }
+    .modal-content .btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    .development-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 3000;
+    }
+    .development-message {
+      background: #fff;
+      padding: 30px;
+      border-radius: 8px;
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      max-width: 500px;
+      width: 90%;
+    }
+    .development-message h2 {
+      font-family: 'Roboto Serif', serif;
+      font-size: 24px;
+      color: #1a2a44;
+      margin-bottom: 15px;
+    }
+    .development-message p {
+      font-size: 18px;
+      color: #555;
+      font-family: 'Times New Roman', Times, serif;
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @media (max-width: 1024px) {
+      .pricing-wrapper {
+        flex-direction: column;
+        align-items: center;
+      }
+      .pricing .plan-card, .pricing .auth-section {
+        max-width: 500px;
+      }
+    }
+    @media (max-width: 768px) {
+      .main-content {
+        padding: 0;
+      }
+      .panel {
+        padding: 0;
+      }
+      .hero-content h1 {
+        font-size: 24px;
+      }
+      .hero-content p {
+        font-size: 16px;
+      }
+      .hero-content .btn {
+        width: 180px;
+        font-size: 16px;
+        padding: 10px 20px;
+      }
+      .nav-brand img {
+        width: 35px;
+      }
+      .nav-brand a {
+        font-size: 18px;
+      }
+      .nav-links {
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+        align-items: stretch;
+      }
+      .nav-links a, .nav-links .dropbtn {
+        padding: 8px;
+        text-align: center;
+      }
+      .dropdown-content {
+        position: static;
+        width: 100%;
+        box-shadow: none;
+        transform: none;
+        text-align: center;
+      }
+      .dropdown-content a {
+        padding: 10px;
+      }
+      .pricing .plan-card, .pricing .auth-section {
+        max-width: none;
+        min-height: 460px;
+      }
+      .benefits-grid, .success-stories-grid, .features-grid, .love-typinghub-grid {
+        grid-template-columns: 1fr;
+      }
+      footer {
+        flex-direction: column;
+        text-align: center;
+        padding: 30px;
+      }
+      .footer-middle {
+        flex-direction: column;
+        gap: 20px;
+      }
+      .footer-section {
+        padding-right: 0;
+        border-right: none;
+      }
+      .footer-section.logo-section img {
+        width: 40px;
+      }
+      .modal-content {
+        width: 95%;
+        padding: 15px;
+      }
+      .development-message h2 {
+        font-size: 20px;
+      }
+      .development-message p {
+        font-size: 16px;
+      }
+    }
+    @media (max-width: 600px) {
+      nav {
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px;
+      }
+      .hero-content h1 {
+        font-size: 20px;
+      }
+      .hero-content p {
+        font-size: 14px;
+      }
+      .hero-content .btn {
+        width: 160px;
+        font-size: 14px;
+        padding: 8px 12px;
+      }
+      .pricing .plan-card, .pricing .auth-section {
+        min-height: 440px;
+      }
+      .modal-content h3 {
+        font-size: 18px;
+      }
+      .modal-content p {
+        font-size: 14px;
+      }
+      .modal-content .btn {
+        padding: 8px 16px;
+        font-size: 14px;
+      }
+      .development-message h2 {
+        font-size: 18px;
+      }
+      .development-message p {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="header"></div>
+  <main class="main-content">
+    <div class="container">
+      <div class="panel">
+        <div class="hero-section">
+          <div class="hero-content">
+            <h1>Unlock Your Typing Potential with TypingHub!</h1>
+            <p>Join thousands of students mastering typing for SSC CGL, CHSL, RRB NTPC, and more!</p>
+            <div style="display: flex; justify-content: center; gap: 20px;">
+              <a href="#auth-section" class="btn" id="register-btn">Register Now</a>
+              <a href="#pricing" class="btn" id="plan-btn">Choose Your Plan</a>
+            </div>
+          </div>
+        </div>
+        <div class="home-content">
+          <div class="home-main" id="pricing">
+            <div class="pricing">
+              <div class="pricing-wrapper">
+                <div class="plan-card" id="basic-plan">
+                  <h3>Basic Plan</h3>
+                  <div class="price">₹149</div>
+                  <ul>
+                    <li><i class="fas fa-check"></i> 30 Interactive Lessons</li>
+                    <li><i class="fas fa-check"></i> Real-Time Feedback</li>
+                    <li><i class="fas fa-check"></i> Score History & Analytics</li>
+                    <li><i class="fas fa-check"></i> Mock Tests (SSC, RRB)</li>
+                    <li><i class="fas fa-check"></i> Virtual Keyboard Practice</li>
+                    <li><i class="fas fa-check"></i> Progress Tracking Dashboard</li>
+                  </ul>
+                  <p class="plan-desc">Master typing with our beginner-friendly course, tailored for govt exams like SSC CGL & RRB NTPC!</p>
+                  <a href="#" class="btn" data-plan="basic" data-price="149">Get Started</a>
+                </div>
+                <div class="plan-card premium" id="premium-plan">
+                  <h3>Premium Plan</h3>
+                  <div class="price">₹199</div>
+                  <ul>
+                    <li><i class="fas fa-check"></i> 30 Interactive Lessons</li>
+                    <li><i class="fas fa-check"></i> Real-Time Feedback</li>
+                    <li><i class="fas fa-check"></i> Score History & Analytics</li>
+                    <li><i class="fas fa-check"></i> Mock Tests (SSC, RRB)</li>
+                    <li><i class="fas fa-check"></i> Virtual Keyboard Practice</li>
+                    <li><i class="fas fa-check"></i> Progress Tracking Dashboard</li>
+                    <li><i class="fas fa-check"></i> Completion Certificate</li>
+                    <li><i class="fas fa-check"></i> Priority Email Support</li>
+                  </ul>
+                  <p class="plan-desc">Elevate your skills with our premium course, including certification and dedicated support for exam success!</p>
+                  <a href="#" class="btn" data-plan="premium" data-price="199">Get Premium</a>
+                </div>
+                <div class="auth-section" id="auth-section">
+                  <div class="auth-card">
+                    <h2 id="auth-title">Get Started Now</h2>
+                    <form id="auth-form">
+                      <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="username" placeholder="Email or Mobile Number" required>
+                      </div>
+                      <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" placeholder="Password" required>
+                        <i class="fas fa-eye toggle-password"></i>
+                      </div>
+                      <ul class="validation-feedback" id="password-feedback">
+                        <li id="first-capital"><i class="fas fa-times-circle"></i> Start with a capital letter</li>
+                        <li id="has-at"><i class="fas fa-times-circle"></i> Include '@' symbol</li>
+                        <li id="has-digit"><i class="fas fa-times-circle"></i> Add one or more digits</li>
+                      </ul>
+                      <button type="submit" id="auth-button">Register</button>
+                      <p id="auth-switch">Already have an account? <a href="#" id="switch-link">Login</a></p>
+                      <p><a href="#" id="forgot-link">Forgot Password/Username?</a></p>
+                    </form>
+                    <form id="forgot-form" class="forgot-form">
+                      <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="forgot-username" placeholder="Enter Email or Mobile Number" required>
+                      </div>
+                      <div style="display: flex; gap: 10px; justify-content: center;">
+                        <button type="submit" id="forgot-password-btn">Reset Password</button>
+                        <button type="submit" id="forgot-username-btn">Recover Username</button>
+                      </div>
+                      <p><a href="#" id="back-to-auth">Back to Login/Register</a></p>
+                    </form>
+                    <form id="otp-form" class="otp-form">
+                      <div class="input-group">
+                        <i class="fas fa-key"></i>
+                        <input type="text" id="otp-input" placeholder="Enter OTP" required>
+                      </div>
+                      <div class="input-group" id="new-password-group" style="display: none;">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="new-password" placeholder="New Password">
+                        <i class="fas fa-eye toggle-password"></i>
+                      </div>
+                      <ul class="validation-feedback" id="new-password-feedback" style="display: none;">
+                        <li id="new-first-capital"><i class="fas fa-times-circle"></i> Start with a capital letter</li>
+                        <li id="new-has-at"><i class="fas fa-times-circle"></i> Include '@' symbol</li>
+                        <li id="new-has-digit"><i class="fas fa-times-circle"></i> Add one or more digits</li>
+                      </ul>
+                      <button type="submit" id="verify-otp-btn">Verify OTP</button>
+                      <p><a href="#" id="back-to-forgot">Back to Forgot Form</a></p>
+                    </form>
+                  </div>
+                </div>
+              </div>
+              <p class="refund-policy">All plans come with a <a href="#">7-day money-back guarantee</a>.</p>
+            </div>
+            <div class="benefits-section">
+              <h2>Why Learn with TypingHub?</h2>
+              <div class="benefits-grid">
+                <div class="benefit-card">
+                  <i class="fas fa-bolt"></i>
+                  <h3>Fast Progress</h3>
+                  <p>Structured lessons to boost your speed in weeks.</p>
+                </div>
+                <div class="benefit-card">
+                  <i class="fas fa-laptop-code"></i>
+                  <h3>Exam-Focused</h3>
+                  <p>Practice tailored for SSC, RRB, and other govt exams.</p>
+                </div>
+                <div class="benefit-card">
+                  <i class="fas fa-trophy"></i>
+                  <h3>Proven Results</h3>
+                  <p>Join thousands who aced their typing tests.</p>
+                </div>
+              </div>
+            </div>
+            <div class="love-typinghub">
+              <h2>Why Students Love TypingHub</h2>
+              <div class="love-typinghub-grid">
+                <div class="love-typinghub-card">
+                  <i class="fas fa-users"></i>
+                  <h3>10,000+ Students Enrolled</h3>
+                  <p>Join a thriving community of learners mastering typing skills!</p>
+                </div>
+                <div class="love-typinghub-card">
+                  <i class="fas fa-check-circle"></i>
+                  <h3>95% Pass Rate</h3>
+                  <p>Our students excel in typing tests for govt exams!</p>
+                </div>
+                <div class="love-typinghub-card">
+                  <i class="fas fa-rocket"></i>
+                  <h3>Join Now!</h3>
+                  <p>Start your journey to typing mastery today!</p>
+                </div>
+              </div>
+            </div>
+            <div class="success-stories">
+              <h2>Success Stories</h2>
+              <div class="success-stories-grid">
+                <div class="success-story-card">
+                  <i class="fas fa-user-graduate"></i>
+                  <h3>Ankit Sharma</h3>
+                  <p>Cleared SSC CGL with 40 WPM! TypingHub’s lessons were a game-changer.</p>
+                </div>
+                <div class="success-story-card">
+                  <i class="fas fa-user-graduate"></i>
+                  <h3>Priya Patel</h3>
+                  <p>Aced RRB NTPC typing test in 3 weeks! Mock tests were spot-on.</p>
+                </div>
+                <div class="success-story-card">
+                  <i class="fas fa-user-graduate"></i>
+                  <h3>Rahul Verma</h3>
+                  <p>Went from 20 to 35 WPM! TypingHub made learning fun and effective.</p>
+                </div>
+              </div>
+            </div>
+            <div class="features">
+              <h2>Course Features</h2>
+              <div class="features-grid">
+                <div class="feature-card">
+                  <i class="fas fa-keyboard"></i>
+                  <h3>Interactive Lessons</h3>
+                  <p>Engaging exercises to improve speed and accuracy.</p>
+                </div>
+                <div class="feature-card">
+                  <i class="fas fa-chart-line"></i>
+                  <h3>Track Progress</h3>
+                  <p>Monitor your improvement with detailed analytics.</p>
+                </div>
+                <div class="feature-card">
+                  <i class="fas fa-certificate"></i>
+                  <h3>Earn Certificates</h3>
+                  <p>Get certified with our Premium Plan.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <div id="footer"></div>
+  <!-- Custom Modal -->
+  <div class="modal-overlay" id="login-modal">
+    <div class="modal-content">
+      <img src="Main LOGO.png" alt="TypingHub Logo">
+      <h3>Please Login or Register</h3>
+      <p>You need to be logged in to proceed with the payment. Choose an option below.</p>
+      <div>
+        <a href="#" class="btn" onclick="closeModal(true, true)">Login</a>
+        <a href="#" class="btn" onclick="closeModal(true, false)">Register</a>
+      </div>
+    </div>
+  </div>
+  <!-- Development Overlay -->
+  <div class="development-overlay" id="development-overlay">
+    <div class="development-message">
+      <h2>Feature Under Development</h2>
+      <p>This feature is currently under development. Please check back later for updates!</p>
+    </div>
+  </div>
+  <script>
+    // Load header
+    fetch('header.html')
+      .then(response => response.ok ? response.text() : `
+        <nav>
+          <div class="nav-brand">
+            <a href="index.html">
+              <img src="Main LOGO.png" alt="TypingHub Logo">
+            </a>
+            <a href="index.html">TypingHub.in</a>
+          </div>
+          <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="typing-test.html">Typing Test</a>
+            <a href="exam-wise-test.html">Exam Wise Test</a>
+            <div class="dropdown">
+              <a href="#" class="dropbtn">Advance Mode</a>
+              <div class="dropdown-content">
+                <a href="create-test.html">Create Own Typing Test</a>
+              </div>
+            </div>
+            <a href="typing-course-landing.html" class="active">Typing Course</a>
+            <a href="admin.html">Admin Panel</a>
+          </div>
+        </nav>
+      `)
+      .then(data => {
+        document.getElementById('header').innerHTML = data;
+        initializeNavigation();
+      })
+      .catch(error => {
+        console.error('Error loading header:', error);
+        document.getElementById('header').innerHTML = `
+          <nav>
+            <div class="nav-brand">
+              <a href="index.html">
+                <img src="Main LOGO.png" alt="TypingHub Logo">
+              </a>
+              <a href="index.html">TypingHub.in</a>
+            </div>
+            <div class="nav-links">
+              <a href="index.html">Home</a>
+              <a href="typing-test.html">Typing Test</a>
+              <a href="exam-wise-test.html">Exam Wise Test</a>
+              <div class="dropdown">
+                <a href="#" class="dropbtn">Advance Mode</a>
+                <div class="dropdown-content">
+                  <a href="create-test.html">Create Own Typing Test</a>
+                </div>
+              </div>
+              <a href="typing-course-landing.html" class="active">Typing Course</a>
+              <a href="admin.html">Admin Panel</a>
+            </div>
+          </nav>
+        `;
+        initializeNavigation();
+      });
+
+    // Load footer
+    fetch('footer.html')
+      .then(response => response.ok ? response.text() : `
+        <footer>
+          <div class="footer-section logo-section">
+            <img src="Main LOGO.png" alt="TypingHub Logo">
+            <a href="index.html">TypingHub.in</a>
+          </div>
+          <div class="footer-middle">
+            <div class="footer-section">
+              <h3>Quick Links</h3>
+              <a href="index.html">Home</a>
+              <a href="typing-test.html">Typing Test</a>
+              <a href="exam-wise-test.html">Exam Wise Test</a>
+              <a href="typing-course-landing.html">Typing Course</a>
+            </div>
+            <div class="footer-section">
+              <h3>Support</h3>
+              <a href="#">FAQ</a>
+              <a href="#">Contact Us</a>
+              <a href="#">Terms & Conditions</a>
+              <a href="#">Privacy Policy</a>
+            </div>
+            <div class="footer-section social-contacts">
+              <h3>Contact Us</h3>
+              <p class="email"><a href="mailto:support@typinghub.in">support@typinghub.in</a></p>
+              <a href="#"><i class="fab fa-facebook-f"></i></a>
+              <a href="#"><i class="fab fa-twitter"></i></a>
+              <a href="#"><i class="fab fa-instagram"></i></a>
+              <a href="#"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+          </div>
+          <p class="footer-copyright">© 2025 TypingHub.in. All rights reserved.</p>
+        </footer>
+      `)
+      .then(data => document.getElementById('footer').innerHTML = data)
+      .catch(error => {
+        console.error('Error loading footer:', error);
+        document.getElementById('footer').innerHTML = `
+          <footer>
+            <div class="footer-section logo-section">
+              <img src="Main LOGO.png" alt="TypingHub Logo">
+              <a href="index.html">TypingHub.in</a>
+            </div>
+            <div class="footer-middle">
+              <div class="footer-section">
+                <h3>Quick Links</h3>
+                <a href="index.html">Home</a>
+                <a href="typing-test.html">Typing Test</a>
+                <a href="exam-wise-test.html">Exam Wise Test</a>
+                <a href="typing-course-landing.html">Typing Course</a>
+              </div>
+              <div class="footer-section">
+                <h3>Support</h3>
+                <a href="#">FAQ</a>
+                <a href="#">Contact Us</a>
+                <a href="#">Terms & Conditions</a>
+                <a href="#">Privacy Policy</a>
+              </div>
+              <div class="footer-section social-contacts">
+                <h3>Contact Us</h3>
+                <p class="email"><a href="mailto:support@typinghub.in">support@typinghub.in</a></p>
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-linkedin-in"></i></a>
+              </div>
+            </div>
+            <p class="footer-copyright">© 2025 TypingHub.in. All rights reserved.</p>
+          </footer>
+        `;
+      });
+
+    // Navigation initialization
+    function initializeNavigation() {
+      const navLinks = document.querySelectorAll('.nav-links a');
+      const developmentOverlay = document.getElementById('development-overlay');
+      
+      navLinks.forEach(link => {
+        link.classList.toggle('active', link.getAttribute('href') === 'typing-course-landing.html');
+        link.addEventListener('click', (e) => {
+          const href = link.getAttribute('href');
+          if (href === 'typing-course-landing.html') {
+            e.preventDefault();
+            developmentOverlay.style.display = 'flex';
+          } else {
+            e.preventDefault();
+            window.location.href = href;
+          }
+        });
+      });
+
+      // Handle dropdown links
+      const dropdownLinks = document.querySelectorAll('.dropdown-content a');
+      dropdownLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          window.location.href = link.getAttribute('href');
+        });
+      });
+    }
+
+    // Modal Functions
+    function showLoginModal() {
+      document.getElementById('login-modal').style.display = 'flex';
+    }
+
+    function closeModal(scrollToAuth, isLogin) {
+      document.getElementById('login-modal').style.display = 'none';
+      if (scrollToAuth) {
+        const authSection = document.getElementById('auth-section');
+        authSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const authTitle = document.getElementById('auth-title');
+        const authButton = document.getElementById('auth-button');
+        const authSwitch = document.getElementById('auth-switch');
+        window.isLogin = isLogin;
+        authTitle.textContent = isLogin ? 'Login' : 'Get Started Now';
+        authButton.textContent = isLogin ? 'Login' : 'Register';
+        authSwitch.innerHTML = isLogin
+          ? `Don't have an account? <a href="#" id="switch-link">Register</a>`
+          : `Already have an account? <a href="#" id="switch-link">Login</a>`;
+      }
+    }
+
+    // Authentication and Payment Logic
+    document.addEventListener('DOMContentLoaded', () => {
+      const authForm = document.getElementById('auth-form');
+      const forgotForm = document.getElementById('forgot-form');
+      const otpForm = document.getElementById('otp-form');
+      const authTitle = document.getElementById('auth-title');
+      const authButton = document.getElementById('auth-button');
+      const authSwitch = document.getElementById('auth-switch');
+      const switchLink = document.getElementById('switch-link');
+      const forgotLink = document.getElementById('forgot-link');
+      const backToAuth = document.getElementById('back-to-auth');
+      const backToForgot = document.getElementById('back-to-forgot');
+      const passwordInput = document.getElementById('password');
+      const newPasswordInput = document.getElementById('new-password');
+      const passwordFeedback = document.getElementById('password-feedback');
+      const newPasswordFeedback = document.getElementById('new-password-feedback');
+      const registerBtn = document.getElementById('register-btn');
+      const planBtn = document.getElementById('plan-btn');
+      const basicPlan = document.getElementById('basic-plan');
+      const premiumPlan = document.getElementById('premium-plan');
+      const authSection = document.getElementById('auth-section');
+
+      window.isLogin = false;
+
+      function validatePassword(password) {
+        const firstCapital = /^[A-Z]/.test(password);
+        const hasAt = password.includes('@');
+        const hasDigit = /\d/.test(password);
+        return { firstCapital, hasAt, hasDigit };
+      }
+
+      function updatePasswordFeedback(password, feedbackElement) {
+        const { firstCapital, hasAt, hasDigit } = validatePassword(password);
+        feedbackElement.querySelector('#first-capital').classList.toggle('valid', firstCapital);
+        feedbackElement.querySelector('#first-capital i').className = firstCapital ? 'fas fa-check-circle' : 'fas fa-times-circle';
+        feedbackElement.querySelector('#has-at').classList.toggle('valid', hasAt);
+        feedbackElement.querySelector('#has-at i').className = hasAt ? 'fas fa-check-circle' : 'fas fa-times-circle';
+        feedbackElement.querySelector('#has-digit').classList.toggle('valid', hasDigit);
+        feedbackElement.querySelector('#has-digit i').className = hasDigit ? 'fas fa-check-circle' : 'fas fa-times-circle';
+        return firstCapital && hasAt && hasDigit;
+      }
+
+      function togglePasswordVisibility(input, icon) {
+        const isPassword = input.type === 'password';
+        input.type = isPassword ? 'text' : 'password';
+        icon.className = isPassword ? 'fas fa-eye-slash toggle-password' : 'fas fa-eye toggle-password';
+      }
+
+      function highlightPlans() {
+        basicPlan.classList.add('highlight');
+        premiumPlan.classList.add('highlight');
+        authSection.classList.remove('highlight');
+        basicPlan.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(() => {
+          basicPlan.classList.remove('highlight');
+          premiumPlan.classList.remove('highlight');
+        }, 2000);
+      }
+
+      function highlightAuth() {
+        authSection.classList.add('highlight');
+        basicPlan.classList.remove('highlight');
+        premiumPlan.classList.remove('highlight');
+        authSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(() => {
+          authSection.classList.remove('highlight');
+        }, 2000);
+      }
+
+      document.querySelectorAll('.toggle-password').forEach(icon => {
+        icon.addEventListener('click', () => {
+          const input = icon.previousElementSibling;
+          togglePasswordVisibility(input, icon);
+        });
+      });
+
+      switchLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.isLogin = !window.isLogin;
+        authTitle.textContent = window.isLogin ? 'Login' : 'Get Started Now';
+        authButton.textContent = window.isLogin ? 'Login' : 'Register';
+        authSwitch.innerHTML = window.isLogin
+          ? `Don't have an account? <a href="#" id="switch-link">Register</a>`
+          : `Already have an account? <a href="#" id="switch-link">Login</a>`;
+      });
+
+      forgotLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        authForm.style.display = 'none';
+        forgotForm.style.display = 'flex';
+      });
+
+      backToAuth.addEventListener('click', (e) => {
+        e.preventDefault();
+        forgotForm.style.display = 'none';
+        authForm.style.display = 'flex';
+      });
+
+      backToForgot.addEventListener('click', (e) => {
+        e.preventDefault();
+        otpForm.style.display = 'none';
+        forgotForm.style.display = 'flex';
+      });
+
+      registerBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        highlightAuth();
+      });
+
+      planBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        highlightPlans();
+      });
+
+      authForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const username = document.getElementById('username').value;
+        const password = passwordInput.value;
+
+        if (!updatePasswordFeedback(password, passwordFeedback)) {
+          passwordFeedback.classList.add('show');
+          alert('Password must start with a capital letter, include @, and have at least one digit.');
+          return;
+        }
+
+        try {
+          if (window.isLogin) {
+            // Login logic
+            const response = await fetch('/api/login', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ username, password })
+            });
+            const data = await response.json();
+            if (response.ok) {
+              const { isAdmin, hasPaid } = data;
+              localStorage.setItem('user', JSON.stringify({ username, isAdmin, hasPaid }));
+              if (isAdmin || hasPaid) {
+                alert('Login successful! Redirecting to course...');
+                window.location.href = 'typing-course-class.html';
+              } else {
+                alert('You need to purchase a plan to access the course.');
+                highlightPlans();
+              }
+            } else {
+              alert(data.error || 'Invalid credentials.');
+            }
+          } else {
+            // Registration logic
+            const response = await fetch('/api/register', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ username, password })
+            });
+            const data = await response.json();
+            if (response.ok) {
+              alert('Registration successful! Please login to continue.');
+              window.isLogin = true;
+              authTitle.textContent = 'Login';
+              authButton.textContent = 'Login';
+              authSwitch.innerHTML = `Don't have an account? <a href="#" id="switch-link">Register</a>`;
+              authForm.reset();
+              passwordFeedback.classList.remove('show');
+            } else {
+              alert(data.error || 'Registration failed.');
+            }
+          }
+        } catch (error) {
+          alert('Error connecting to server.');
+          console.error(error);
+        }
+      });
+
+      forgotForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const username = document.getElementById('forgot-username').value;
+        try {
+          const response = await fetch('/api/forgot', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username })
+          });
+          const data = await response.json();
+          if (response.ok) {
+            alert('OTP sent to your email/mobile.');
+            forgotForm.style.display = 'none';
+            otpForm.style.display = 'flex';
+          } else {
+            alert(data.error || 'Failed to send OTP.');
+          }
+        } catch (error) {
+          alert('Error connecting to server.');
+          console.error(error);
+        }
+      });
+
+      otpForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const otp = document.getElementById('otp-input').value;
+        const newPassword = document.getElementById('new-password').value;
+
+        if (document.getElementById('new-password-group').style.display === 'none') {
+          document.getElementById('new-password-group').style.display = 'block';
+          newPasswordFeedback.style.display = 'block';
+          return;
+        }
+
+        if (!updatePasswordFeedback(newPassword, newPasswordFeedback)) {
+          newPasswordFeedback.classList.add('show');
+          alert('New password must start with a capital letter, include @, and have at least one digit.');
+          return;
+        }
+
+        try {
+          const response = await fetch('/api/reset-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ otp, newPassword })
+          });
+          const data = await response.json();
+          if (response.ok) {
+            alert('Password reset successful! Please login.');
+            otpForm.style.display = 'none';
+            authForm.style.display = 'flex';
+            authForm.reset();
+            window.isLogin = true;
+            authTitle.textContent = 'Login';
+            authButton.textContent = 'Login';
+            authSwitch.innerHTML = `Don't have an account? <a href="#" id="switch-link">Register</a>`;
+          } else {
+            alert(data.error || 'Invalid OTP.');
+          }
+        } catch (error) {
+          alert('Error connecting to server.');
+          console.error(error);
+        }
+      });
+
+      passwordInput.addEventListener('input', () => {
+        passwordFeedback.classList.add('show');
+        updatePasswordFeedback(passwordInput.value, passwordFeedback);
+      });
+
+      passwordInput.addEventListener('blur', () => {
+        if (!passwordInput.value) {
+          passwordFeedback.classList.remove('show');
+        }
+      });
+
+      newPasswordInput.addEventListener('input', () => {
+        newPasswordFeedback.classList.add('show');
+        updatePasswordFeedback(newPasswordInput.value, newPasswordFeedback);
+      });
+
+      newPasswordInput.addEventListener('blur', () => {
+        if (!newPasswordInput.value) {
+          newPasswordFeedback.classList.remove('show');
+        }
+      });
+
+      document.querySelectorAll('.plan-card .btn').forEach(button => {
+        button.addEventListener('click', async (e) => {
+          e.preventDefault();
+          if (!window.Razorpay) {
+            alert('Payment gateway is loading, please try again in a moment.');
+            return;
+          }
+
+          const user = JSON.parse(localStorage.getItem('user') || '{}');
+          if (!user.username) {
+            showLoginModal();
+            return;
+          }
+
+          const plan = button.getAttribute('data-plan');
+          const price = button.getAttribute('data-price');
+
+          const options = {
+            key: 'rzp_test_YOUR_RAZORPAY_KEY_ID', // Replace with your actual Razorpay key
+            amount: parseInt(price) * 100,
+            currency: 'INR',
+            name: 'TypingHub',
+            description: `${plan.charAt(0).toUpperCase() + plan.slice(1)} Course`,
+            image: 'Main LOGO.png', // Replace with your actual logo URL
+            handler: async function (response) {
+              try {
+                const paymentResponse = await fetch('/api/payment', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    username: user.username,
+                    plan,
+                    payment_id: response.razorpay_payment_id
+                  })
+                });
+                const paymentData = await paymentResponse.json();
+                if (paymentResponse.ok) {
+                  alert(`Payment successful for ${plan}! Payment ID: ${response.razorpay_payment_id}`);
+                  localStorage.setItem('user', JSON.stringify({ username: user.username, isAdmin: false, hasPaid: true }));
+                  window.location.href = 'typing-course-class.html';
+                } else {
+                  alert(paymentData.error || 'Payment verification failed.');
+                }
+              } catch (error) {
+                alert('Error processing payment.');
+                console.error(error);
+              }
+            },
+            prefill: {
+              name: '',
+              email: user.username.includes('@') ? user.username : '',
+              contact: user.username.match(/^\d{10}$/) ? user.username : ''
+            },
+            theme: {
+              color: '#1976d2',
+              backdrop_color: 'rgba(0,0,0,0.7)',
+              font: 'Times New Roman, Times, serif',
+              button_shape: 'rounded'
+            },
+            modal: {
+              ondismiss: function () {
+                console.log('Payment modal closed');
+              },
+              animation: true
+            }
+          };
+
+          try {
+            const rzp = new Razorpay(options);
+            rzp.on('payment.failed', function (response) {
+              alert(`Payment failed: ${response.error.description}`);
+            });
+            rzp.open();
+          } catch (error) {
+            alert('Failed to initialize payment. Please try again.');
+            console.error(error);
+          }
+        });
+      });
+    });
+
+    // Simulated server-side logic for testing (replace with actual backend)
+    (function () {
+      const originalFetch = window.fetch;
+      window.fetch = async function (url, options) {
+        const body = options && options.body ? JSON.parse(options.body) : {};
+        if (url === '/api/register') {
+          // Simulate registration
+          if (body.username && body.password) {
+            localStorage.setItem(`user_${body.username}`, JSON.stringify({ username: body.username, password: body.password, isAdmin: false, hasPaid: false }));
+            return {
+              ok: true,
+              json: async () => ({ message: 'Registration successful' })
+            };
+          }
+          return {
+            ok: false,
+            json: async () => ({ error: 'Invalid username or password' })
+          };
+        }
+        if (url === '/api/login') {
+          // Simulate login
+          if (body.username === 'admin@typinghub.in' && body.password === 'Admin@123') {
+            localStorage.setItem('user', JSON.stringify({ username: body.username, isAdmin: true, hasPaid: true }));
+            return {
+              ok: true,
+              json: async () => ({ isAdmin: true, hasPaid: true })
+            };
+          }
+          const userData = JSON.parse(localStorage.getItem(`user_${body.username}`) || '{}');
+          if (userData.username === body.username && userData.password === body.password) {
+            localStorage.setItem('user', JSON.stringify({ username: body.username, isAdmin: false, hasPaid: userData.hasPaid }));
+            return {
+              ok: true,
+              json: async () => ({ isAdmin: false, hasPaid: userData.hasPaid })
+            };
+          }
+          return {
+            ok: false,
+            json: async () => ({ error: 'Invalid credentials' })
+          };
+        }
+        if (url === '/api/forgot') {
+          // Simulate forgot password
+          if (body.username) {
+            return {
+              ok: true,
+              json: async () => ({ message: 'OTP sent' })
+            };
+          }
+          return {
+            ok: false,
+            json: async () => ({ error: 'Invalid username' })
+          };
+        }
+        if (url === '/api/reset-password') {
+          // Simulate password reset
+          if (body.otp && body.newPassword) {
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            if (user.username) {
+              localStorage.setItem(`user_${user.username}`, JSON.stringify({ ...user, password: body.newPassword }));
+              return {
+                ok: true,
+                json: async () => ({ message: 'Password reset successful' })
+              };
+            }
+            return {
+              ok: false,
+              json: async () => ({ error: 'No user logged in' })
+            };
+          }
+          return {
+            ok: false,
+            json: async () => ({ error: 'Invalid OTP' })
+          };
+        }
+        if (url === '/api/payment') {
+          // Simulate payment verification
+          if (body.username && body.plan && body.payment_id) {
+            localStorage.setItem(`user_${body.username}`, JSON.stringify({ username: body.username, password: JSON.parse(localStorage.getItem(`user_${body.username}`) || '{}').password, isAdmin: false, hasPaid: true }));
+            return {
+              ok: true,
+              json: async () => ({ message: 'Payment verified' })
+            };
+          }
+          return {
+            ok: false,
+            json: async () => ({ error: 'Payment verification failed' })
+          };
+        }
+        return originalFetch(url, options);
+      };
+    })();
+  </script>
+</body>
+</html>

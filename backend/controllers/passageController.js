@@ -105,8 +105,25 @@ const getPassagesByTestType = async (req, res) => {
   }
 
   try {
-    const passages = await Passage.find({ testTypes: testType });
-    console.log(`Fetched passages for test type ${testType}:`, passages.length);
+    // Decode the URL-encoded test type
+    const decodedTestType = decodeURIComponent(testType);
+    console.log('Searching for test type:', decodedTestType);
+
+    // Use case-insensitive search
+    const passages = await Passage.find({
+      testTypes: { $regex: new RegExp(`^${decodedTestType}$`, 'i') }
+    });
+
+    console.log(`Fetched passages for test type ${decodedTestType}:`, passages.length);
+    
+    if (passages.length === 0) {
+      console.log(`No passages found for test type: ${decodedTestType}`);
+      return res.status(404).json({ 
+        message: `No passages found for test type: ${decodedTestType}`,
+        testType: decodedTestType
+      });
+    }
+
     res.status(200).json(passages);
   } catch (error) {
     console.error('Error fetching passages by test type:', error.message, error.stack);

@@ -1301,12 +1301,14 @@
     }
 
     // Fetch passages from API
-    async function fetchPassages() {
+    async function fetchPassages(retryCount = 0) {
       try {
         const apiUrl = window.location.hostname === 'localhost' 
           ? 'http://localhost:6000/api'
           : 'https://typinghub.in/api';
           
+        console.log('Fetching passages from:', apiUrl);
+        
         const response = await fetch(`${apiUrl}/passages/test/Typing%20Test`, {
           method: 'GET',
           headers: {
@@ -1314,49 +1316,61 @@
           },
           credentials: 'include'
         });
+
         if (!response.ok) {
-          throw new Error(`Failed to fetch passages: ${response.status}`);
+          const errorData = await response.json().catch(() => ({}));
+          console.error('Server response:', errorData);
+          throw new Error(`Failed to fetch passages: ${response.status} - ${errorData.message || 'Unknown error'}`);
         }
-        passages = await response.json();
-        console.log('Passages fetched for Typing Test:', passages);
+
+        const passages = await response.json();
+        console.log('Fetched passages:', passages.length);
+        return passages;
       } catch (error) {
-        console.error('Error fetching passages:', error.message);
-        passages = [];
-        sampleText.textContent = 'Error loading passages. Please try again later.';
+        console.error('Error fetching passages:', error);
+        
+        // Retry logic (max 3 attempts)
+        if (retryCount < 3) {
+          console.log(`Retrying... Attempt ${retryCount + 1} of 3`);
+          await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1))); // Exponential backoff
+          return fetchPassages(retryCount + 1);
+        }
+        
+        throw error;
       }
     }
 
     // Populate passage selector
     async function populatePassageSelector() {
-      await fetchPassages();
-      passageSelector.innerHTML = '<option value="">Select Passage</option>';
-      if (passages.length === 0) {
-        passageSelector.innerHTML += '<option value="" disabled>No passages available</option>';
-        sampleText.textContent = 'No passages available for Typing Test. Please contact the admin.';
-        return;
-      }
-
-      let validPassages = 0;
-      passages.forEach((passage, index) => {
-        if (passage.title && passage.content) {
-          // No length validation; include all passages
+      try {
+        const passages = await fetchPassages();
+        const selector = document.getElementById('passage-selector');
+        selector.innerHTML = '<option value="">Select Passage</option>';
+        
+        passages.forEach((passage, index) => {
           const option = document.createElement('option');
-          option.value = index.toString();
-          option.textContent = passage.title || `Passage ${index + 1}`;
-          passageSelector.appendChild(option);
-          validPassages++;
+          option.value = index;
+          option.textContent = passage.title;
+          selector.appendChild(option);
+        });
+        
+        if (passages.length > 0) {
+          displayPassage();
+        } else {
+          console.warn('No passages available');
+          // Show a message to the user
+          const messageDiv = document.createElement('div');
+          messageDiv.className = 'alert alert-warning';
+          messageDiv.textContent = 'No passages available at the moment. Please try again later.';
+          document.querySelector('.container').prepend(messageDiv);
         }
-      });
-
-      if (validPassages === 0) {
-        passageSelector.innerHTML += '<option value="" disabled>No valid passages available</option>';
-        sampleText.textContent = 'No valid passages available for Typing Test. Please contact the admin.';
-        return;
-      }
-
-      if (passages.length > 0) {
-        passageSelector.value = '0';
-        displayPassage();
+      } catch (error) {
+        console.error('Error populating passage selector:', error);
+        // Show error message to user
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'alert alert-danger';
+        messageDiv.textContent = 'Failed to load passages. Please refresh the page or try again later.';
+        document.querySelector('.container').prepend(messageDiv);
       }
     }
 

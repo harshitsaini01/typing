@@ -109,19 +109,20 @@ const getPassagesByTestType = async (req, res) => {
     const decodedTestType = decodeURIComponent(testType);
     console.log('Searching for test type:', decodedTestType);
 
-    // Use case-insensitive search
+    // Create a case-insensitive regex pattern
+    const testTypePattern = new RegExp(decodedTestType.replace(/\s+/g, '\\s*'), 'i');
+
+    // Find passages where testTypes array contains a matching test type
     const passages = await Passage.find({
-      testTypes: { $regex: new RegExp(`^${decodedTestType}$`, 'i') }
+      testTypes: { $regex: testTypePattern }
     });
 
     console.log(`Fetched passages for test type ${decodedTestType}:`, passages.length);
     
     if (passages.length === 0) {
       console.log(`No passages found for test type: ${decodedTestType}`);
-      return res.status(404).json({ 
-        message: `No passages found for test type: ${decodedTestType}`,
-        testType: decodedTestType
-      });
+      // Return empty array instead of 404 to prevent frontend errors
+      return res.status(200).json([]);
     }
 
     res.status(200).json(passages);

@@ -1351,24 +1351,46 @@
       try {
         const passages = await fetchPassages();
         const selector = document.getElementById('passage-selector');
-        selector.innerHTML = '<option value="">Select Passage</option>';
+        selector.innerHTML = ''; // Clear existing options
         
-        passages.forEach((passage, index) => {
-          const option = document.createElement('option');
-          option.value = index;
-          option.textContent = passage.title;
-          selector.appendChild(option);
-        });
-        
-        if (passages.length > 0) {
-          displayPassage();
-        } else {
+        if (!passages || passages.length === 0) {
           console.warn('No passages available');
           // Show a message to the user
           const messageDiv = document.createElement('div');
           messageDiv.className = 'alert alert-warning';
-          messageDiv.textContent = 'No passages available at the moment. Please try again later.';
+          messageDiv.textContent = 'No passages available for this test type. Please try another test or contact the admin.';
           document.querySelector('.container').prepend(messageDiv);
+          
+          // Disable the test area
+          typingArea.disabled = true;
+          startButton.disabled = true;
+          return;
+        }
+        
+        // Add a default option
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'Select a passage';
+        selector.appendChild(defaultOption);
+        
+        // Add passage options
+        passages.forEach((passage, index) => {
+          if (passage.title && passage.content) {
+            const option = document.createElement('option');
+            option.value = index;
+            option.textContent = passage.title;
+            selector.appendChild(option);
+          }
+        });
+        
+        // Enable the test area
+        typingArea.disabled = false;
+        startButton.disabled = false;
+        
+        // Select the first passage by default
+        if (passages.length > 0) {
+          selector.value = '0';
+          displayPassage();
         }
       } catch (error) {
         console.error('Error populating passage selector:', error);
@@ -1377,6 +1399,10 @@
         messageDiv.className = 'alert alert-danger';
         messageDiv.textContent = 'Failed to load passages. Please refresh the page or try again later.';
         document.querySelector('.container').prepend(messageDiv);
+        
+        // Disable the test area
+        typingArea.disabled = true;
+        startButton.disabled = true;
       }
     }
 
@@ -1420,46 +1446,26 @@
 
     // Display selected passage
     function displayPassage() {
-      const selectedPassageIndex = passageSelector.value;
-      const passage = passages[parseInt(selectedPassageIndex)];
-      if (passage && passage.title && passage.content) {
-        passageWords = passage.content.trim().split(/\s+/);
-        sampleText.innerHTML = '';
-        wordElements = [];
-        passageWords.forEach((word, index) => {
-          const wordSpan = document.createElement('span');
-          wordSpan.className = 'word';
-          wordSpan.innerHTML = word.split('').map(char => `<span>${sanitizeInput(char)}</span>`).join('');
-          if (index === currentWordIndex) {
-            wordSpan.classList.add('current-word');
-          }
-          sampleText.appendChild(wordSpan);
-          sampleText.appendChild(document.createTextNode(' '));
-          wordElements.push(wordSpan);
-        });
-        calculateWordsPerLine();
-      } else if (passages.length > 0 && passages[0].title && passages[0].content) {
-        passageSelector.value = '0';
-        passageWords = passages[0].content.trim().split(/\s+/);
-        sampleText.innerHTML = '';
-        wordElements = [];
-        passageWords.forEach((word, index) => {
-          const wordSpan = document.createElement('span');
-          wordSpan.className = 'word';
-          wordSpan.innerHTML = word.split('').map(char => `<span>${sanitizeInput(char)}</span>`).join('');
-          if (index === currentWordIndex) {
-            wordSpan.classList.add('current-word');
-          }
-          sampleText.appendChild(wordSpan);
-          sampleText.appendChild(document.createTextNode(' '));
-          wordElements.push(wordSpan);
-        });
-        calculateWordsPerLine();
-      } else {
-        sampleText.textContent = 'No passages available for Typing Test. Please contact the admin.';
-        passageWords = [];
-        wordElements = [];
+      const selectedIndex = passageSelector.value;
+      if (selectedIndex === '') {
+        sampleText.textContent = 'Please select a passage';
+        return;
       }
+      
+      if (!passages || !passages[selectedIndex]) {
+        sampleText.textContent = 'No passage available';
+        return;
+      }
+      
+      const passage = passages[selectedIndex];
+      if (!passage.content) {
+        sampleText.textContent = 'Invalid passage content';
+        return;
+      }
+      
+      sampleText.textContent = passage.content;
+      currentPassage = passage;
+      resetTest();
     }
 
     // Update word highlight

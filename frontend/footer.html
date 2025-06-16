@@ -1,0 +1,277 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" loading="lazy">
+</head>
+<body>
+<footer>
+  <div class="footer-container">
+    <div class="footer-section logo-section">
+      <img src="Main LOGO.png" alt="TypingHub Logo">
+    </div>
+    <div class="footer-section legal-section">
+      <h3>Legal</h3>
+      <div class="link-container">
+        <a href="about-us.html">About Us</a>
+        <a href="declaration.html">Declaration</a>
+        <a href="terms-of-service.html">Terms of Service</a>
+        <a href="privacy-policy.html">Privacy Policy</a>
+        <a href="contact-us.html">Contact Us</a>
+      </div>
+    </div>
+    <div class="footer-section links-section">
+      <h3>Quick Links</h3>
+      <div class="link-container">
+        <a href="typing-test.html">Typing Test</a>
+        <a href="exam-wise-test.html">Exam Wise Test</a>
+        <a href="create-test.html">Create Own Test</a>
+        <a href="typing-course-landing.html">Typing Course</a>
+        <a href="blog.html">Blog</a>
+        <a href="faqs.html">FAQs</a>
+      </div>
+    </div>
+    <div class="footer-section social-section">
+      <h3>Social Contacts</h3>
+      <div class="link-container">
+        <p>Connect for Exams & Typing Updates</p>
+        <div class="social-icons">
+          <a href="https://wa.me/1234567890" target="_blank" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+          <a href="https://instagram.com" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="https://twitter.com" target="_blank" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+          <a href="https://youtube.com" target="_blank" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+          <a href="https://t.me" target="_blank" aria-label="Telegram"><i class="fab fa-telegram-plane"></i></a>
+        </div>
+        <p class="email"><a href="mailto:Contact@TypingHub.in">Contact@TypingHub.in</a></p>
+      </div>
+    </div>
+  </div>
+  <p class="copyright">Copyright © 2025 TypingHub.in. All Rights Reserved.</p>
+</footer>
+
+<style>
+  footer {
+    background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+    color: #333;
+    padding: 60px 20px 10px;
+    font-family: 'Roboto Serif', serif;
+    width: 100vw;
+    max-width: none;
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+    border-top: 1px solid #1976d2;
+  }
+  .footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    justify-content: flex-start;
+  }
+  .footer-section {
+    flex: 1;
+    min-width: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    border: none;
+  }
+  .footer-section.logo-section {
+    flex: 0 0 auto;
+    align-items: flex-start;
+    margin-right: 40px;
+  }
+  .footer-section.logo-section img {
+    width: 200px;
+    height: auto;
+    margin-bottom: 10px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+  }
+  .footer-section.legal-section,
+  .footer-section.links-section,
+  .footer-section.social-section {
+    margin-left: 20px;
+  }
+  .footer-section h3 {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #1976d2;
+    margin: 0 0 15px 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    white-space: nowrap; /* Ensure heading stays on one line */
+  }
+  .link-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 0;
+  }
+  .footer-section a {
+    font-family: 'Times New Roman', Times, serif;
+    color: #333;
+    text-decoration: none;
+    font-size: 16px;
+    margin-bottom: 10px;
+    transition: color 0.3s, transform 0.2s;
+  }
+  .footer-section a:hover {
+    color: #1565c0;
+    transform: translateX(5px);
+  }
+  .footer-section p {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 10px;
+    white-space: nowrap; /* Ensure text stays on one line */
+  }
+  .social-section .social-icons {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+  }
+  .social-section .social-icons a {
+    font-size: 24px;
+    transition: transform 0.3s;
+  }
+  .social-section .social-icons a:hover {
+    transform: scale(1.3);
+  }
+  .social-section .social-icons a .fa-whatsapp {
+    color: #25D366;
+  }
+  .social-section .social-icons a .fa-instagram {
+    color: #E4405F;
+  }
+  .social-section .social-icons a .fa-twitter {
+    color: #1DA1F2;
+  }
+  .social-section .social-icons a .fa-youtube {
+    color: #FF0000;
+  }
+  .social-section .social-icons a .fa-telegram-plane {
+    color: #0088CC;
+  }
+  .social-section .email {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 16px;
+    color: #555;
+  }
+  .social-section .email a {
+    color: #1976d2;
+    text-decoration: none;
+  }
+  .social-section .email a:hover {
+    color: #1565c0;
+  }
+  .copyright {
+    font-family: 'Roboto Serif', serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: #333;
+    text-align: center;
+    margin: 20px 0 0;
+    padding: 0;
+    width: 100%;
+    display: block;
+  }
+  @media (max-width: 768px) {
+    footer {
+      padding: 40px 15px 10px;
+    }
+    .footer-container {
+      flex-direction: column;
+      gap: 20px;
+    }
+    .footer-section {
+      min-width: auto;
+    }
+    .footer-section.logo-section {
+      margin-right: 0;
+      align-items: center;
+    }
+    .footer-section.logo-section img {
+      width: 120px;
+    }
+    .footer-section.legal-section,
+    .footer-section.links-section,
+    .footer-section.social-section {
+      margin-left: 0;
+    }
+    .footer-section h3 {
+      font-size: 18px;
+    }
+    .footer-section a, .footer-section p {
+      font-size: 14px;
+    }
+    .social-section .social-icons a {
+      font-size: 20px;
+    }
+    .copyright {
+      font-size: 14px;
+      margin: 15px 0 0;
+    }
+  }
+  @media (max-width: 400px) {
+    .footer-section.logo-section img {
+      width: 100px;
+    }
+    .footer-section h3 {
+      font-size: 16px;
+    }
+    .footer-section a, .footer-section p {
+      font-size: 13px;
+    }
+    .social-section .social-icons a {
+      font-size: 18px;
+    }
+    .copyright {
+      font-size: 13px;
+      margin: 10px 0 0;
+    }
+  }
+</style>
+</body>
+</html>

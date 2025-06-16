@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Earn Your Free Typing Certificate - TypingHub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Serif:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Times New Roman', Times, serif;
+      background: #f5f5f5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+    .main-content {
+      flex: 1;
+      padding: 0;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+    }
+    .container {
+      max-width: 100%;
+      width: 100%;
+      margin: 0;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .panel {
+      background: #fff;
+      padding: 20px;
+      min-height: 100vh;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    nav {
+      background: #fff;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      width: 100%;
+    }
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .nav-brand img {
+      width: 70px;
+      height: auto;
+    }
+    .nav-brand a {
+      font-family: 'Roboto Serif', serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: #1976d2;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    .nav-brand a:hover {
+      color: #40c4ff;
+    }
+    .nav-links {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .nav-links a, .nav-links .dropbtn {
+      color: #333;
+      text-decoration: none;
+      font-size: 16px;
+      padding: 8px 15px;
+      border-radius: 4px;
+      font-weight: 400;
+      transition: background-color 0.3s;
+      font-family: 'Times New Roman', Times, serif;
+    }
+    .nav-links a:hover, .nav-links .dropbtn:hover {
+      background-color: #FFFF00;
+      color: #000;
+    }
+    .nav-links a.active {
+      background-color: #1976d2;
+      color: #fff;
+    }
+    .dropdown {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background: #fff;
+      min-width: 200px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      border-radius: 4px;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1;
+      padding: 5px 0;
+    }
+    .dropdown-content a {
+      color: #333;
+      padding: 10px 0;
+      text-decoration: none;
+      display: block;
+      font-size: 14px;
+      font-family: 'Times New Roman', Times, serif;
+      text-align: center;
+    }
+    .dropdown-content a:hover {
+      background-color: #FFFF00;
+      color: #000;
+    }
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+    .certificate-content {
+      max-width: 800px;
+      margin: 40px auto;
+      text-align: center;
+    }
+    .certificate-content h1 {
+      font-family: 'Roboto Serif', serif;
+      font-size: 32px;
+      font-weight: 700;
+      color: #1a2a44;
+      margin-bottom: 15px;
+    }
+    .certificate-content p {
+      font-size: 18px;
+      color: #555;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+    .progress-bar {
+      background: #e3f2fd;
+      padding: 20px;
+      border-radius: 6px;
+      margin: 20px 0;
+    }
+    .progress-bar p {
+      font-size: 18px;
+      font-weight: 500;
+      color: #1976d2;
+    }
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.3s;
+      display: inline-flex;
+      align-items: center;
+    }
+    .btn-primary {
+      background: #1976d2;
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: #1565c0;
+    }
+    .btn-disabled {
+      background: #ccc;
+      color: #fff;
+      cursor: not-allowed;
+    }
+    .ad-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+    }
+    .ad-content {
+      background: #fff;
+      padding: 20px;
+      border-radius: 6px;
+      text-align: center;
+      max-width: 600px;
+      width: 90%;
+    }
+    .ad-content video {
+      max-width: 100%;
+      border-radius: 6px;
+    }
+    .ad-content p {
+      margin: 10px 0;
+    }
+    footer {
+      background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+      color: #333;
+      padding: 45px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 20px;
+      box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+      border-top: 1px solid #1976d2;
+      width: 100vw;
+      max-width: none;
+    }
+    .footer-middle {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      flex: 2;
+    }
+    footer h3 {
+      color: #1976d2;
+      font-size: 18px;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+    footer a {
+      color: #333;
+      text-decoration: none;
+      font-size: 16px;
+      display: block;
+      margin-bottom: 10px;
+      transition: color 0.3s;
+    }
+    footer a:hover {
+      color: #1565c0;
+    }
+    footer p {
+      color: #333;
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+    .footer-copyright {
+      text-align: center;
+      width: 100%;
+      color: #333;
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+    .footer-section {
+      flex: 1;
+      min-width: 200px;
+      padding-right: 20px;
+      border-right: 1px solid rgba(0,0,0,0.1);
+    }
+    .footer-section:last-child {
+      border-right: none;
+    }
+    .footer-section.logo-section {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-right: none;
+    }
+    .footer-section.logo-section img {
+      width: 80px;
+      height: auto;
+    }
+    .footer-section.social-contacts a {
+      display: inline-block;
+      margin-right: 12px;
+      font-size: 22px;
+      color: #333;
+      transition: transform 0.2s, color 0.2s;
+    }
+    .footer-section.social-contacts a:hover {
+      transform: scale(1.2);
+      color: #1976d2;
+    }
+    .footer-section.social-contacts p.email {
+      color: #1976d2;
+    }
+    @media (max-width: 768px) {
+      .main-content {
+        padding: 0;
+      }
+      .panel {
+        padding: 15px;
+      }
+      .certificate-content h1 {
+        font-size: 24px;
+      }
+      .certificate-content p {
+        font-size: 16px;
+      }
+      .nav-brand img {
+        width: 35px;
+      }
+      .nav-brand a {
+        font-size: 18px;
+      }
+      .nav-links {
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+        align-items: stretch;
+      }
+      .nav-links a, .nav-links .dropbtn {
+        padding: 8px;
+        text-align: center;
+      }
+      .dropdown-content {
+        position: static;
+        width: 100%;
+        box-shadow: none;
+        transform: none;
+        text-align: center;
+      }
+      .dropdown-content a {
+        padding: 10px;
+      }
+      footer {
+        flex-direction: column;
+        text-align: center;
+        padding: 30px;
+      }
+      .footer-middle {
+        flex-direction: column;
+        gap: 20px;
+      }
+      .footer-section {
+        padding-right: 0;
+        border-right: none;
+      }
+      .footer-section.social-contacts a {
+        display: inline-block;
+        margin: 5px;
+      }
+      .footer-section.logo-section img {
+        width: 40px;
+      }
+    }
+    @media (max-width: 600px) {
+      nav {
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px;
+      }
+      .certificate-content h1 {
+        font-size: 20px;
+      }
+      .certificate-content p {
+        font-size: 14px;
+      }
+      .btn {
+        padding: 8px 15px;
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="header"></div>
+  <main class="main-content">
+    <div class="container">
+      <div class="panel">
+        <div class="certificate-content">
+          <h1>Earn Your Free Typing Certificate</h1>
+          <p>Complete 3 typing tests on TypingHub to earn a personalized PDF certificate with your name and typing speed. Perfect for showcasing your skills for government exams like CPCT, SSC, RRB, and Police!</p>
+          <div class="progress-bar">
+            <p id="progress-text">You’ve completed 0/3 tests</p>
+          </div>
+          <p>Start or continue your typing tests now. Once you complete 3 tests, you can download your certificate.</p>
+          <a href="typing-test-certificate-test.html" class="btn btn-primary">Take Typing Test</a>
+          <button id="download-btn" class="btn btn-disabled" disabled>Download Certificate</button>
+        </div>
+        <div id="ad-modal" class="ad-modal">
+          <div class="ad-content">
+            <p>Please watch the ad to download your certificate.</p>
+            <video id="ad-video" controls>
+              <source src="placeholder-ad.mp4" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+            <p id="ad-message" style="display: none;">Ad completed! You can now download your certificate.</p>
+            <a id="certificate-link" href="certificate.pdf" download style="display: none;" class="btn btn-primary">Download Certificate</a>
+            <button id="close-ad" class="btn btn-secondary" style="margin-top: 10px;">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <div id="footer"></div>
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+  <script>
+    // Load header and footer dynamically
+    async function loadHeaderFooter() {
+      const headerElement = document.getElementById('header');
+      const footerElement = document.getElementById('footer');
+      const defaultHeader = `
+        <nav>
+          <div class="nav-brand">
+            <a href="index.html">
+              <img src="Main LOGO.png" alt="TypingHub Logo">
+            </a>
+            <a href="index.html">TypingHub.in</a>
+          </div>
+          <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="typing-test.html">Typing Test</a>
+            <a href="exam-wise-test.html">Exam Wise Test</a>
+            <div class="dropdown">
+              <a href="#" class="dropbtn">Advance Mode</a>
+              <div class="dropdown-content">
+                <a href="create-test.html">Create Own Typing Test</a>
+              </div>
+            </div>
+            <a href="typing-class.html">Typing Class</a>
+            <a href="admin.html">Admin Panel</a>
+          </div>
+        </nav>
+      `;
+      const defaultFooter = `
+        <footer>
+          <div class="footer-section logo-section">
+            <a href="index.html">
+              <img src="Main LOGO.png" alt="TypingHub Logo">
+            </a>
+          </div>
+          <div class="footer-middle">
+            <div class="footer-section">
+              <h3>Legal</h3>
+              <a href="about-us.html">About us</a>
+              <a href="declaration.html">Declaration</a>
+              <a href="terms-of-service.html">Terms of service</a>
+              <a href="privacy-policy.html">Privacy Policy</a>
+              <a href="contact-us.html">Contact us</a>
+            </div>
+            <div class="footer-section">
+              <h3>Quick Links</h3>
+              <a href="typing-test.html">Typing Test</a>
+              <a href="exam-wise-test.html">Exam Wise Test</a>
+              <a href="create-test.html">Create Own Test</a>
+              <a href="typing-class.html">Typing Class</a>
+              <a href="blog.html">Blog</a>
+              <a href="faqs.html">FAQs</a>
+            </div>
+            <div class="footer-section social-contacts">
+              <h3>Social Contacts</h3>
+              <p>Follow only for Exams and Typing related matters.</p>
+              <a href="https://whatsapp.com" target="_blank"><i class="fab fa-whatsapp"></i></a>
+              <a href="https://instagram.com" target="_blank"><i class="fab fa-instagram"></i></a>
+              <a href="https://twitter.com" target="_blank"><i class="fab fa-twitter"></i></a>
+              <a href="https://telegram.org" target="_blank"><i class="fab fa-telegram"></i></a>
+              <a href="mailto:support@typinghub.in"><i class="fas fa-envelope"></i></a>
+              <p class="email"><a href="mailto:support@typinghub.in">support@typinghub.in</a></p>
+            </div>
+          </div>
+          <p class="footer-copyright">Copyright © 2024 TypingHub.in</p>
+        </footer>
+      `;
+      try {
+        const [headerResponse, footerResponse] = await Promise.all([
+          fetch('header.html').then(res => res.ok ? res.text() : defaultHeader),
+          fetch('footer.html').then(res => res.ok ? res.text() : defaultFooter)
+        ]);
+        headerElement.innerHTML = headerResponse;
+        footerElement.innerHTML = footerResponse;
+      } catch (e) {
+        console.error('Error loading header/footer:', e);
+        headerElement.innerHTML = defaultHeader;
+        footerElement.innerHTML = defaultFooter;
+      }
+    }
+
+    // Certificate and ad modal logic
+    document.addEventListener('DOMContentLoaded', () => {
+      loadHeaderFooter().then(() => {
+        // Load test progress from localStorage
+        let testsCompleted = 0;
+        try {
+          testsCompleted = parseInt(localStorage.getItem('testsCompleted')) || 0;
+        } catch (e) {
+          console.error('Error reading testsCompleted from localStorage:', e);
+        }
+        const progressText = document.getElementById('progress-text');
+        const downloadBtn = document.getElementById('download-btn');
+        
+        // Update progress display
+        progressText.textContent = `You’ve completed ${testsCompleted}/3 tests`;
+        if (testsCompleted >= 3) {
+          downloadBtn.classList.remove('btn-disabled');
+          downloadBtn.classList.add('btn-primary');
+          downloadBtn.disabled = false;
+        }
+
+        // Ad modal handling
+        const adModal = document.getElementById('ad-modal');
+        const adVideo = document.getElementById('ad-video');
+        const adMessage = document.getElementById('ad-message');
+        const certificateLink = document.getElementById('certificate-link');
+        const closeAdBtn = document.getElementById('close-ad');
+
+        downloadBtn.addEventListener('click', () => {
+          if (testsCompleted >= 3) {
+            if (adVideo.querySelector('source').src) {
+              adModal.style.display = 'flex';
+              adVideo.play().catch(e => {
+                console.error('Error playing ad video:', e);
+                adMessage.textContent = 'Ad video unavailable. You can download your certificate now.';
+                adMessage.style.display = 'block';
+                certificateLink.style.display = 'inline-flex';
+                closeAdBtn.style.display = 'none';
+              });
+            } else {
+              adMessage.textContent = 'Ad video unavailable. You can download your certificate now.';
+              adModal.style.display = 'flex';
+              adMessage.style.display = 'block';
+              certificateLink.style.display = 'inline-flex';
+              closeAdBtn.style.display = 'none';
+            }
+          }
+        });
+
+        adVideo.addEventListener('ended', () => {
+          adMessage.style.display = 'block';
+          certificateLink.style.display = 'inline-flex';
+          closeAdBtn.style.display = 'none';
+        });
+
+        closeAdBtn.addEventListener('click', () => {
+          adModal.style.display = 'none';
+          adVideo.pause();
+        });
+
+        // Navigation active link handling
+        const navLinks = document.querySelectorAll('.nav-links a');
+        const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+        navLinks.forEach(link => {
+          const href = link.getAttribute('href');
+          if (href === currentPage || (href === 'typing-test.html' && currentPage === 'certificate.html')) {
+            link.classList.add('active');
+          } else {
+            link.classList.remove('active');
+          }
+        });
+      });
+    });
+  </script>
+  <script>
+    try {
+      (function(){
+        function c(){
+          var b=a.contentDocument||a.contentWindow.document;
+          if(b){
+            var d=b.createElement('script');
+            d.innerHTML="window.__CF$cv$params={r:'93eb8c1e0af5b0ca',t:'MTc0NzA3MDAxMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
+            b.getElementsByTagName('head')[0].appendChild(d)
+          }
+        }
+        if(document.body){
+          var a=document.createElement('iframe');
+          a.height=1;
+          a.width=1;
+          a.style.position='absolute';
+          a.style.top=0;
+          a.style.left=0;
+          a.style.border='none';
+          a.style.visibility='hidden';
+          document.body.appendChild(a);
+          if('loading'!==document.readyState) c();
+          else if(window.addEventListener) document.addEventListener('DOMContentLoaded',c);
+          else {
+            var e=document.onreadystatechange||function(){};
+            document.onreadystatechange=function(b){
+              e(b);
+              'loading'!==document.readyState&&(document.onreadystatechange=e,c())
+            }
+          }
+        }
+      })();
+    } catch (e) {
+      console.error('Cloudflare challenge script failed:', e);
+    }
+  </script>
+</body>
+</html>

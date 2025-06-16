@@ -1,0 +1,201 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Serif:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    nav {
+      background: #fff;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      width: 100%;
+    }
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .nav-brand img {
+      width: 70px;
+      height: auto;
+    }
+    .nav-brand a {
+      font-family: 'Roboto Serif', serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: #1976d2;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    .nav-brand a:hover {
+      color: #40c4ff;
+    }
+    .nav-links {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .nav-links a, .nav-links .dropbtn {
+      color: #333;
+      text-decoration: none;
+      font-size: 16px;
+      padding: 8px 15px;
+      border-radius: 4px;
+      font-weight: 400;
+      transition: background-color 0.3s;
+      font-family: 'Times New Roman', Times, serif;
+    }
+    .nav-links a:hover, .nav-links .dropbtn:hover {
+      background-color: #FFFF00;
+      color: #000;
+    }
+    .nav-links a.active {
+      background-color: #1976d2;
+      color: #fff;
+    }
+    .dropdown {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background: #fff;
+      min-width: 200px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      border-radius: 4px;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1;
+      padding: 5px 0;
+    }
+    .dropdown-content a {
+      color: #333;
+      padding: 10px 0;
+      text-decoration: none;
+      display: block;
+      font-size: 14px;
+      font-family: 'Times New Roman', Times, serif;
+      text-align: center;
+    }
+    .dropdown-content a:hover {
+      background-color: #FFFF00;
+      color: #000;
+    }
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+    @media (max-width: 768px) {
+      .nav-links {
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+        align-items: stretch;
+      }
+      .nav-links a, .nav-links .dropbtn {
+        padding: 8px;
+        text-align: center;
+      }
+      .dropdown-content {
+        position: static;
+        width: 100%;
+        box-shadow: none;
+        transform: none;
+        text-align: center;
+      }
+      .dropdown-content a {
+        padding: 10px;
+      }
+      .nav-brand img {
+        width: 35px;
+      }
+      .nav-brand a {
+        font-size: 18px;
+      }
+    }
+    @media (max-width: 600px) {
+      nav {
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="nav-brand">
+      <a href="index.html">
+        <img src="Main LOGO.png" alt="TypingHub Logo">
+      </a>
+      <a href="index.html">TypingHub.in</a>
+    </div>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="typing-test.html">Typing Test</a>
+      <a href="exam-wise-test.html">Exam Wise Test</a>
+      <div class="dropdown">
+        <a href="#" class="dropbtn">Advance Mode</a>
+        <div class="dropdown-content">
+          <a href="create-test.html">Create Your Own Test</a>
+        </div>
+      </div>
+      <a href="typing-course-landing.html">Typing Course</a>
+      <a href="admin.html">Admin Panel</a>
+    </div>
+  </nav>
+</body>
+</html>

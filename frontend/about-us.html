@@ -1,0 +1,549 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Learn about TypingHub.in's mission to help students excel in typing tests and government exams.">
+  <meta name="keywords" content="TypingHub about us, typing test platform, typing course provider">
+  <title>About Us - TypingHub.in 🎯</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Serif:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" loading="lazy">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Times New Roman', Times, serif;
+      background: #f5f5f5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+    .main-content {
+      flex: 1;
+      padding: 0;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+    }
+    .container {
+      width: 100vw;
+      max-width: none;
+      margin: 0;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .panel {
+      background: #fff;
+      padding: 0;
+      min-height: 100vh;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    nav {
+      background: #fff;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      width: 100%;
+    }
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .nav-brand img {
+      width: 70px;
+      height: auto;
+    }
+    .nav-brand a {
+      font-family: 'Roboto Serif', serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: #1976d2;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    .nav-brand a:hover {
+      color: #40c4ff;
+    }
+    .nav-links {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .nav-links a, .nav-links .dropbtn {
+      color: #333;
+      text-decoration: none;
+      font-size: 16px;
+      padding: 8px 15px;
+      border-radius: 4px;
+      font-weight: 400;
+      transition: background-color 0.3s;
+      font-family: 'Times New Roman', Times, serif;
+    }
+    .nav-links a:hover, .nav-links .dropbtn:hover {
+      background-color: #FFFF00;
+      color: #000;
+    }
+    .nav-links a.active {
+      background-color: #1976d2;
+      color: #fff;
+    }
+    .dropdown {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background: #fff;
+      min-width: 200px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      border-radius: 4px;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1;
+      padding: 5px 0;
+    }
+    .dropdown-content a {
+      color: #333;
+      padding: 10px 0;
+      text-decoration: none;
+      display: block;
+      font-size: 14px;
+      font-family: 'Times New Roman', Times, serif;
+      text-align: center;
+    }
+    .dropdown-content a:hover {
+      background-color: #FFFF00;
+      color: #000;
+    }
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+    .hamburger {
+      display: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #333;
+    }
+    .about-hero-section {
+      background: #e3f2fd;
+      padding: 60px 0;
+      text-align: center;
+      border-top: 2px solid #1976d2;
+      border-bottom: 2px solid #1976d2;
+      margin-bottom: 40px;
+    }
+    .about-hero-content {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    .about-hero-content h1 {
+      font-family: 'Roboto Serif', serif;
+      font-size: 36px;
+      font-weight: 700;
+      color: #1a2a44;
+      margin-bottom: 20px;
+    }
+    .about-hero-content p {
+      font-size: 18px;
+      color: #555;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+    .about-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    .mission-vision {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 30px;
+      margin-bottom: 60px;
+    }
+    .mission, .vision {
+      background: #fff;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .mission h2, .vision h2 {
+      font-family: 'Roboto Serif', serif;
+      font-size: 28px;
+      color: #1a2a44;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .mission p, .vision p {
+      font-size: 18px;
+      color: #555;
+      line-height: 1.6;
+    }
+    .features {
+      margin-bottom: 60px;
+    }
+    .features h2 {
+      font-family: 'Roboto Serif', serif;
+      font-size: 32px;
+      color: #1a2a44;
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+    }
+    .feature-card {
+      background: #fff;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .feature-card i {
+      font-size: 40px;
+      color: #1976d2;
+      margin-bottom: 20px;
+    }
+    .feature-card h3 {
+      font-family: 'Roboto Serif', serif;
+      font-size: 22px;
+      color: #1a2a44;
+      margin-bottom: 15px;
+    }
+    .feature-card p {
+      font-size: 16px;
+      color: #555;
+      line-height: 1.6;
+    }
+    .team {
+      margin-bottom: 60px;
+    }
+    .team h2 {
+      font-family: 'Roboto Serif', serif;
+      font-size: 32px;
+      color: #1a2a44;
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 30px;
+    }
+    .team-member {
+      background: #fff;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .team-member img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      margin-bottom: 20px;
+      object-fit: cover;
+    }
+    .team-member h3 {
+      font-family: 'Roboto Serif', serif;
+      font-size: 20px;
+      color: #1a2a44;
+      margin-bottom: 10px;
+    }
+    .team-member p {
+      font-size: 16px;
+      color: #555;
+      margin-bottom: 15px;
+    }
+    .social-links {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+    .social-links a {
+      color: #1976d2;
+      font-size: 20px;
+      transition: transform 0.3s;
+    }
+    .social-links a:hover {
+      transform: scale(1.2);
+    }
+    @media (max-width: 992px) {
+      .features-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .team-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media (max-width: 768px) {
+      .mission-vision {
+        grid-template-columns: 1fr;
+      }
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+      .team-grid {
+        grid-template-columns: 1fr;
+      }
+      .about-hero-content h1 {
+        font-size: 28px;
+      }
+      .about-hero-content p {
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="header"></div>
+  <main class="main-content">
+    <div class="container">
+      <div class="panel">
+        <div class="about-hero-section">
+          <div class="about-hero-content">
+            <h1>About TypingHub.in 🎯</h1>
+            <p>Empowering students to achieve their dreams through expert typing education and practice</p>
+          </div>
+        </div>
+        <div class="about-content">
+          <div class="mission-vision">
+            <div class="mission">
+              <h2><i class="fas fa-bullseye"></i> Our Mission</h2>
+              <p>To provide high-quality, accessible typing education and practice resources that help students excel in government exams and professional careers. We're committed to making typing mastery achievable for everyone through innovative learning methods and comprehensive practice materials.</p>
+            </div>
+            <div class="vision">
+              <h2><i class="fas fa-eye"></i> Our Vision</h2>
+              <p>To become India's leading platform for typing education and exam preparation, known for our commitment to student success, innovative learning methods, and comprehensive practice resources. We aim to help millions of students achieve their career goals.</p>
+            </div>
+          </div>
+
+          <div class="features">
+            <h2>Why Choose TypingHub? 🌟</h2>
+            <div class="features-grid">
+              <div class="feature-card">
+                <i class="fas fa-graduation-cap"></i>
+                <h3>Expert-Led Learning</h3>
+                <p>Our courses are designed by typing experts with years of experience in government exam preparation.</p>
+              </div>
+              <div class="feature-card">
+                <i class="fas fa-laptop-code"></i>
+                <h3>Comprehensive Practice</h3>
+                <p>Access a vast library of typing tests, practice materials, and exam-specific resources.</p>
+              </div>
+              <div class="feature-card">
+                <i class="fas fa-chart-line"></i>
+                <h3>Track Progress</h3>
+                <p>Monitor your improvement with detailed analytics and performance tracking tools.</p>
+              </div>
+              <div class="feature-card">
+                <i class="fas fa-users"></i>
+                <h3>Community Support</h3>
+                <p>Join a community of learners and get support from experienced mentors.</p>
+              </div>
+              <div class="feature-card">
+                <i class="fas fa-certificate"></i>
+                <h3>Certification</h3>
+                <p>Earn recognized certificates to showcase your typing proficiency.</p>
+              </div>
+              <div class="feature-card">
+                <i class="fas fa-clock"></i>
+                <h3>24/7 Access</h3>
+                <p>Practice anytime, anywhere with our online platform and mobile-friendly interface.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="team">
+            <h2>Meet Our Team 👥</h2>
+            <div class="team-grid">
+              <div class="team-member">
+                <img src="team-images/founder.jpg" alt="Founder">
+                <h3>Rajesh Kumar</h3>
+                <p>Founder & CEO</p>
+                <div class="social-links">
+                  <a href="#"><i class="fab fa-linkedin"></i></a>
+                  <a href="#"><i class="fab fa-twitter"></i></a>
+                </div>
+              </div>
+              <div class="team-member">
+                <img src="team-images/tech-lead.jpg" alt="Tech Lead">
+                <h3>Priya Singh</h3>
+                <p>Technical Lead</p>
+                <div class="social-links">
+                  <a href="#"><i class="fab fa-linkedin"></i></a>
+                  <a href="#"><i class="fab fa-github"></i></a>
+                </div>
+              </div>
+              <div class="team-member">
+                <img src="team-images/content-head.jpg" alt="Content Head">
+                <h3>Amit Sharma</h3>
+                <p>Content Head</p>
+                <div class="social-links">
+                  <a href="#"><i class="fab fa-linkedin"></i></a>
+                  <a href="#"><i class="fab fa-twitter"></i></a>
+                </div>
+              </div>
+              <div class="team-member">
+                <img src="team-images/instructor.jpg" alt="Lead Instructor">
+                <h3>Neha Patel</h3>
+                <p>Lead Instructor</p>
+                <div class="social-links">
+                  <a href="#"><i class="fab fa-linkedin"></i></a>
+                  <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <div id="footer"></div>
+  <!-- Recommendation: Add cache headers for static assets (e.g., favicon.png, Main LOGO.png) to improve performance -->
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js" defer></script>
+  <script defer>
+    console.log('Script execution started at:', new Date().toISOString());
+
+    // Load header
+    fetch('./header.html')
+      .then(response => {
+        console.log('Fetching header.html... Status:', response.status, 'URL:', response.url);
+        if (!response.ok) {
+          throw new Error(`Failed to load header: ${response.status} ${response.statusText}`);
+        }
+        return response.text();
+      })
+      .then(data => {
+        console.log('Header loaded successfully');
+        document.getElementById('header').innerHTML = data;
+        initializeNavigation();
+        initializeHamburger();
+      })
+      .catch(error => {
+        console.error('Error loading header:', error);
+        document.getElementById('header').innerHTML = '<p class="error-message">Failed to load header. Please try again or check your connection.</p>';
+      });
+
+    // Load footer
+    fetch('./footer.html')
+      .then(response => {
+        console.log('Fetching footer.html... Status:', response.status, 'URL:', response.url);
+        if (!response.ok) {
+          throw new Error(`Failed to load footer: ${response.status} ${response.statusText}`);
+        }
+        return response.text();
+      })
+      .then(data => {
+        console.log('Footer loaded successfully');
+        document.getElementById('footer').innerHTML = data;
+      })
+      .catch(error => {
+        console.error('Error loading footer:', error);
+        document.getElementById('footer').innerHTML = '<p class="error-message">Failed to load footer. Please try again or check your connection.</p>';
+      });
+
+    // Navigation initialization
+    function initializeNavigation() {
+      const navLinks = document.querySelectorAll('.nav-links a');
+      if (navLinks.length === 0) {
+        console.warn('No navigation links found for initialization');
+        return;
+      }
+      navLinks.forEach(link => {
+        const href = link.getAttribute('href');
+        const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+        if (href === currentPage) {
+          link.classList.add('active');
+        } else {
+          link.classList.remove('active');
+        }
+      });
+      console.log('Navigation initialized');
+    }
+
+    // Hamburger menu toggle
+    function initializeHamburger() {
+      const hamburger = document.querySelector('.hamburger');
+      const navLinks = document.querySelector('.nav-links');
+      if (!hamburger || !navLinks) {
+        console.warn('Hamburger or nav-links not found for initialization');
+        return;
+      }
+      hamburger.addEventListener('click', () => {
+        navLinks.classList.toggle('active');
+        console.log('Hamburger menu toggled');
+      });
+    }
+
+    // Initialize on DOMContentLoaded
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('DOM fully loaded, initializing navigation and hamburger');
+      initializeNavigation();
+      initializeHamburger();
+    });
+  </script>
+</body>
+</html>

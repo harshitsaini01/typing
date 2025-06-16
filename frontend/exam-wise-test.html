@@ -1,0 +1,949 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TypingHub - Exam Wise Typing Tests</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Serif:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --logo-size: 100px;
+      --logo-gap: 15px;
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Times New Roman', Times, serif;
+      background: #f5f7fa;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+    .main-content {
+      flex: 1;
+      padding: 0;
+      background: #f5f7fa;
+      display: flex;
+      flex-direction: column;
+    }
+    .container {
+      max-width: 100%;
+      width: 100%;
+      margin: 0;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .panel {
+      background: #fff;
+      border-radius: 0;
+      box-shadow: none;
+      padding: 20px;
+      min-height: 100vh;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    nav {
+      background: #fff;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .nav-brand img {
+      width: 70px;
+      height: auto;
+    }
+    .nav-brand a {
+      font-family: 'Roboto Serif', serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: #1976d2;
+      text-decoration: none;
+    }
+    .nav-links {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .nav-links a, .nav-links .dropbtn {
+      color: #333;
+      text-decoration: none;
+      font-size: 16px;
+      padding: 8px 15px;
+      border-radius: 4px;
+      font-weight: 400;
+      transition: background-color 0.3s;
+    }
+    .nav-links a:hover, .nav-links .dropbtn:hover {
+      background-color: #FFFF00;
+      color: #000;
+    }
+    .nav-links a.active {
+      background-color: #1976d2;
+      color: #fff;
+    }
+    .dropdown {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background: #fff;
+      min-width: 180px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      border-radius: 4px;
+      top: 100%;
+      left: 0;
+      z-index: 1;
+    }
+    .dropdown-content a {
+      color: #333;
+      padding: 10px 15px;
+      text-decoration: none;
+      display: block;
+      font-size: 14px;
+    }
+    .dropdown-content a:hover {
+      background-color: #FFFF00;
+      color: #000;
+    }
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+    h2 {
+      font-family: 'Roboto Serif', serif;
+      font-size: 24px;
+      color: #1a2a44;
+      margin-bottom: 10px;
+    }
+    p {
+      color: #333;
+      font-size: 16px;
+      margin-bottom: 20px;
+      line-height: 1.6;
+      font-family: 'Times New Roman', Times, serif;
+    }
+    .card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 25px;
+      margin-bottom: 20px;
+      box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      border: 1px solid #e0e0e0;
+      width: 100%;
+      flex: 1;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+    }
+    .test-container {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .test-main {
+      flex: 3;
+      min-width: 300px;
+    }
+    .test-sidebar {
+      flex: 1;
+      min-width: 250px;
+    }
+    .test-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      background: #f9f9f9;
+      padding: 15px;
+      border-radius: 8px;
+      width: 100%;
+    }
+    textarea, #searchInput {
+      padding: 12px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      background: #fafafa;
+      font-family: 'Times New Roman', Times, serif;
+    }
+    textarea:focus, #searchInput:focus {
+      border-color: #1976d2;
+      box-shadow: 0 0 6px rgba(64,196,255,0.3);
+      outline: none;
+      background: #fff;
+    }
+    #searchInput {
+      width: 100%;
+      max-width: 200px;
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%231976d2"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>') no-repeat right 10px center;
+      background-size: 16px;
+    }
+    .search-item {
+      display: flex;
+      align-items: center;
+    }
+    textarea {
+      width: 100%;
+      height: 200px;
+      resize: none;
+    }
+    .sample-text-container {
+      height: 200px;
+      overflow-y: auto;
+      background: #fafafa;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 15px;
+      margin: 20px 0;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+      width: 100%;
+    }
+    .sample-text {
+      font-size: 16px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+    .sample-text span {
+      transition: background-color 0.3s;
+    }
+    .sample-text .correct {
+      background-color: #c8e6c9;
+    }
+    .sample-text .incorrect {
+      background-color: #ffcdd2;
+    }
+    .sample-text .current-letter {
+      background-color: #1976d2;
+      color: #fff;
+      padding: 1px 2px;
+      border-radius: 2px;
+    }
+    .timer {
+      font-size: 18px;
+      font-weight: 500;
+      color: #fff;
+      background: #ef5350;
+      padding: 8px 12px;
+      border-radius: 6px;
+    }
+    .timer.low-time {
+      background: #d32f2f;
+    }
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin: 5px;
+    }
+    .btn-primary {
+      background: #1976d2;
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: #1565c0;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    .btn-success {
+      background: #4caf50;
+      color: #fff;
+    }
+    .btn-success:hover {
+      background: #388e3c;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(76,175,80,0.2);
+    }
+    .btn-danger {
+      background: #ef5350;
+      color: #fff;
+    }
+    .btn-danger:hover {
+      background: #d32f2f;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(255,82,82,0.2);
+    }
+    .btn:disabled {
+      background: #cccccc;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    .live-stats {
+      background: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+      width: 100%;
+    }
+    .live-stats h3 {
+      color: #1976d2;
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+    .live-stats p {
+      display: flex;
+      justify-content: space-between;
+      font-size: 16px;
+      margin: 8px 0;
+    }
+    .live-stats p span {
+      font-weight: 500;
+      color: #ef5350;
+    }
+    .logo-container-outer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 15px 0;
+      flex-wrap: wrap;
+      gap: 15px;
+      padding: 0 10px;
+    }
+    .logo-container {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      background: linear-gradient(135deg, #fff, #f8f9fa);
+      padding: 15px;
+      border-radius: 10px;
+      border: 2px solid #1976d2;
+      box-shadow: 0 8px 25px rgba(25, 118, 210, 0.15);
+      flex-wrap: wrap;
+      gap: 15px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .logo-container:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 30px rgba(25, 118, 210, 0.2);
+    }
+    .logo-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      transition: transform 0.3s ease;
+    }
+    .logo-item:hover {
+      transform: scale(1.05);
+    }
+    .logo-ssc, .logo-railway, .logo-cbse, .logo-court {
+      width: 80px;
+      height: 80px;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+      transition: filter 0.3s ease;
+    }
+    .logo-item:hover img {
+      filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.2));
+    }
+    .logo-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: #1a2a44;
+      text-transform: uppercase;
+      text-align: center;
+      margin-top: 8px;
+      background: #e3f2fd;
+      padding: 3px 10px;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+    }
+    .logo-item:hover .logo-label {
+      background: #1976d2;
+      color: #fff;
+    }
+    .search-item {
+      display: flex;
+      align-items: center;
+      position: relative;
+      width: 100%;
+      max-width: 300px;
+    }
+    #searchInput {
+      width: 100%;
+      padding: 12px 35px 12px 15px;
+      font-size: 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 20px;
+      transition: all 0.3s ease;
+      background: #fff;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+    #searchInput:focus {
+      border-color: #1976d2;
+      box-shadow: 0 4px 20px rgba(25, 118, 210, 0.15);
+      outline: none;
+    }
+    .search-item::after {
+      content: '\f002';
+      font-family: 'Font Awesome 6 Free';
+      font-weight: 900;
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #1976d2;
+      font-size: 16px;
+      pointer-events: none;
+      transition: color 0.3s ease;
+    }
+    .search-item:focus-within::after {
+      color: #1565c0;
+    }
+    .instructions {
+      background: #e3f2fd;
+      padding: 15px;
+      border-radius: 6px;
+      border: 1px solid #bbdefb;
+      margin-bottom: 15px;
+    }
+    .panel-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      padding: 15px 0;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      justify-content: center;
+    }
+    .panel-item {
+      flex: 1;
+      min-width: 250px;
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transition: transform 0.3s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 250px;
+      max-width: 300px;
+    }
+    .panel-item:hover {
+      transform: translateY(-5px);
+    }
+    .panel-item i {
+      font-size: 40px;
+      color: #1976d2;
+      margin-bottom: 10px;
+    }
+    .panel-item p {
+      flex-grow: 1;
+      margin-bottom: 15px;
+    }
+    .exam-card {
+      flex: 1;
+      min-width: 175px;
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      padding: 14px;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transition: transform 0.3s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 175px;
+      max-width: 210px;
+    }
+    .exam-card.hidden {
+      display: none;
+    }
+    .exam-card:hover {
+      transform: translateY(-5px);
+    }
+    .exam-card i {
+      font-size: 28px;
+      color: #1976d2;
+      margin-bottom: 7px;
+    }
+    .exam-card h5 {
+      font-size: 13px;
+      font-family: 'Roboto Serif', serif;
+      color: #1a2a44;
+      margin-bottom: 7px;
+    }
+    .exam-card p {
+      font-size: 11px;
+      flex-grow: 1;
+      margin-bottom: 10px;
+      color: #555;
+    }
+    .exam-card .btn {
+      padding: 8px 17px;
+      font-size: 11px;
+      width: 100%;
+      max-width: 140px;
+    }
+    footer {
+      background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+      color: #333;
+      padding: 45px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 20px;
+      box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+      border-top: 1px solid #1976d2;
+      width: 100vw;
+      max-width: none;
+    }
+    .footer-middle {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      flex: 2;
+    }
+    footer h3 {
+      color: #1976d2;
+      font-size: 18px;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+    footer a {
+      color: #333;
+      text-decoration: none;
+      font-size: 16px;
+      display: block;
+      margin-bottom: 10px;
+      transition: color 0.3s;
+    }
+    footer a:hover {
+      color: #1565c0;
+    }
+    footer p {
+      color: #333;
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+    .footer-copyright {
+      text-align: center;
+      width: 100%;
+      color: #333;
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+    .footer-section {
+      flex: 1;
+      min-width: 200px;
+      padding-right: 20px;
+      border-right: 1px solid rgba(0,0,0,0.1);
+    }
+    .footer-section:last-child {
+      border-right: none;
+    }
+    .footer-section.logo-section {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-right: none;
+    }
+    .footer-section.logo-section img {
+      width: 80px;
+      height: auto;
+    }
+    .footer-section.social-contacts a {
+      display: inline-block;
+      margin-right: 12px;
+      font-size: 22px;
+      color: #333;
+      transition: transform 0.2s, color 0.2s;
+    }
+    .footer-section.social-contacts a:hover {
+      transform: scale(1.2);
+      color: #1976d2;
+    }
+    .footer-section.social-contacts p.email {
+      color: #1976d2;
+    }
+    @media (max-width: 768px) {
+      .logo-container {
+        padding: 12px;
+        gap: 12px;
+      }
+      .logo-ssc, .logo-railway, .logo-cbse, .logo-court {
+        width: 60px;
+        height: 60px;
+      }
+      .logo-label {
+        font-size: 11px;
+        padding: 3px 8px;
+      }
+      #searchInput {
+        padding: 10px 32px 10px 12px;
+        font-size: 14px;
+      }
+      .search-item::after {
+        right: 12px;
+        font-size: 14px;
+      }
+      .main-content {
+        padding: 0;
+      }
+      .panel {
+        padding: 15px;
+      }
+      .nav-brand img {
+        width: 35px;
+      }
+      .nav-brand a {
+        font-size: 18px;
+      }
+      .nav-links {
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+        align-items: stretch;
+      }
+      .nav-links a, .nav-links .dropbtn {
+        padding: 8px;
+        text-align: center;
+      }
+      .dropdown-content {
+        position: static;
+        width: 100%;
+        box-shadow: none;
+      }
+      .btn {
+        padding: 10px 20px;
+        font-size: 14px;
+      }
+      .panel-container {
+        flex-direction: column;
+        padding: 10px 0;
+      }
+      .panel-item, .exam-card {
+        min-height: auto;
+        max-width: none;
+      }
+      .exam-card {
+        min-width: 150px;
+      }
+      footer {
+        flex-direction: column;
+        text-align: center;
+        padding: 30px;
+      }
+      .footer-middle {
+        flex-direction: column;
+        gap: 20px;
+      }
+      .footer-section {
+        padding-right: 0;
+        border-right: none;
+      }
+      .footer-section.social-contacts a {
+        margin: 5px;
+      }
+      .footer-section.logo-section img {
+        width: 40px;
+      }
+    }
+    @media (max-width: 600px) {
+      :root {
+        --logo-size: 60px;
+        --logo-gap: 8px;
+      }
+      nav {
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px;
+      }
+      .test-header {
+        flex-direction: column;
+        gap: 10px;
+      }
+      .btn {
+        padding: 8px 16px;
+        font-size: 13px;
+      }
+      .live-stats h3 {
+        font-size: 16px;
+      }
+      .live-stats p {
+        font-size: 14px;
+      }
+      .exam-card {
+        min-width: 120px;
+      }
+      .logo-label {
+        font-size: 10px;
+      }
+      .logo-container {
+        box-shadow: 0 0 8px rgba(255, 98, 0, 0.3);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="header"></div>
+  <main class="main-content">
+    <div class="container">
+      <div class="panel">
+        <div id="exam-wise-test-page" class="active">
+          <div class="card">
+            <div class="instructions">
+              <p><strong>Real Exam Simulation</strong>: Experience timed tests (10-15 minutes) that mirror the structure and difficulty of SSC, Railway, and Supreme Court typing exams, such as 2000 key depressions for SSC-CGL/CHSL or specific WPM requirements for Junior Court Assistant.<br>
+              <strong>Previous Year Passages</strong>: Practice with carefully curated passages based on past SSC, Railway, and Supreme Court exams, including terms like "recruitment," "railway operations," "court proceedings," and symbols like @#$%, to build familiarity.<br>
+              <strong>Instant Feedback</strong>: Get real-time stats on your typing speed (WPM), accuracy, and correct words, allowing you to track progress and focus on improvement.<br>
+              <strong>Score High with Confidence</strong>: Regular practice with our tests will boost your typing proficiency, helping you achieve the high scores needed to clear these competitive exams.<br>
+              Start practicing today and take a step closer to acing your typing test in the actual exam!</p>
+            </div>
+            <div class="logo-container-outer" id="exam-button-container">
+              <div class="logo-container">
+                <div class="logo-item">
+                  <img src="SSC.png" class="logo-ssc" alt="SSC Logo">
+                  <span class="logo-label">SSC</span>
+                </div>
+                <div class="logo-item">
+                  <img src="RAILWAY.png" class="logo-railway" alt="Railway Logo">
+                  <span class="logo-label">RAILWAY</span>
+                </div>
+                <div class="logo-item">
+                  <img src="Cbse.png" class="logo-cbse" alt="CBSE Logo">
+                  <span class="logo-label">CBSE</span>
+                </div>
+                <div class="logo-item">
+                  <img src="court.png" class="logo-court" alt="Supreme Court Logo">
+                  <span class="logo-label">SUPREME COURT</span>
+                </div>
+              </div>
+              <div class="search-item">
+                <input type="text" id="searchInput" placeholder="Search exams...">
+              </div>
+            </div>
+            <section class="panel-container">
+              <div class="exam-card">
+                <i class="fas fa-graduation-cap"></i>
+                <h5>SSC-CGL Typing Test</h5>
+                <p>Practice for SSC-CGL with 2000 key depressions in 15 minutes.</p>
+                <a href="ssc-cgl-test.html" class="btn btn-primary">Take SSC-CGL Test</a>
+              </div>
+              <div class="exam-card">
+                <i class="fas fa-graduation-cap"></i>
+                <h5>SSC-CHSL Typing Test</h5>
+                <p>Prepare for SSC-CHSL with real exam passages and speed goals.</p>
+                <a href="ssc-chsl-test.html" class="btn btn-primary">Take SSC-CHSL Test</a>
+              </div>
+              <div class="exam-card">
+                <i class="fas fa-train"></i>
+                <h5>RRB-NTPC Typing Test</h5>
+                <p>Master RRB-NTPC typing with Hindi and English passages.</p>
+                <a href="rrb-ntpc-test.html" class="btn btn-primary">Take RRB-NTPC Test</a>
+              </div>
+              <div class="exam-card">
+                <i class="fas fa-briefcase"></i>
+                <h5>Junior Assistant Test</h5>
+                <p>Excel in Junior Assistant typing with accurate practice.</p>
+                <a href="junior-assistant-test.html" class="btn btn-primary">Take JA Test</a>
+              </div>
+              <div class="exam-card">
+                <i class="fas fa-user-tie"></i>
+                <h5>Superintendent Test</h5>
+                <p>Practice for Superintendent typing with exam-like conditions.</p>
+                <a href="superintendent-test.html" class="btn btn-primary">Take Sup. Test</a>
+              </div>
+              <div class="exam-card">
+                <i class="fas fa-gavel"></i>
+                <h5>Jr. Court Assistant Test</h5>
+                <p>Master Junior Court Assistant typing with legal terms.</p>
+                <a href="junior-court-assistant-test.html" class="btn btn-primary">Take JCA Test</a>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <div id="footer"></div>
+  <script>
+    function initializeNavigation() {
+      const navLinks = document.querySelectorAll('.nav-links a');
+      if (navLinks.length) {
+        navLinks.forEach(link => {
+          if (link.getAttribute('href') === 'exam-wise-test.html') {
+            link.classList.add('active');
+          } else {
+            link.classList.remove('active');
+          }
+        });
+      } else {
+        console.warn('Navigation links not found');
+      }
+    }
+
+    function filterExamCards() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      const examCards = document.querySelectorAll('.exam-card');
+      examCards.forEach(card => {
+        const title = card.querySelector('h5').textContent.toLowerCase();
+        if (title.includes(searchTerm) || searchTerm === '') {
+          card.classList.remove('hidden');
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+    }
+
+    Promise.all([
+      fetch('header.html').then(response => response.ok ? response.text() : Promise.reject('Header fetch failed')),
+      fetch('footer.html').then(response => response.ok ? response.text() : Promise.reject('Footer fetch failed'))
+    ])
+      .then(([headerData, footerData]) => {
+        console.log('Header and footer loaded successfully');
+        document.getElementById('header').innerHTML = headerData;
+        document.getElementById('footer').innerHTML = footerData;
+        initializeNavigation();
+      })
+      .catch(error => {
+        console.warn('Error loading header/footer:', error);
+        document.getElementById('header').innerHTML = `
+          <nav>
+            <div class="nav-brand">
+              <a href="index.html">
+                <img src="Main LOGO.png" alt="TypingHub Logo">
+              </a>
+              <a href="index.html">TypingHub.in</a>
+            </div>
+            <div class="nav-links">
+              <a href="index.html">Home</a>
+              <a href="typing-test.html">Typing Test</a>
+              <a href="exam-wise-test.html" class="active">Exam Wise Test</a>
+              <div class="dropdown">
+                <a href="#" class="dropbtn">Advance Mode</a>
+                <div class="dropdown-content">
+                  <a href="create-test.html">Create Own Typing Test</a>
+                </div>
+              </div>
+              <a href="typing-class.html">Typing Class</a>
+              <a href="admin.html">Admin Panel</a>
+            </div>
+          </nav>
+        `;
+        document.getElementById('footer').innerHTML = `
+          <footer>
+            <div class="footer-section logo-section">
+              <a href="index.html">
+                <img src="Main LOGO.png" alt="TypingHub Logo">
+              </a>
+            </div>
+            <div class="footer-middle">
+              <div class="footer-section">
+                <h3>Legal</h3>
+                <a href="about-us.html">About us</a>
+                <a href="declaration.html">Declaration</a>
+                <a href="terms-of-service.html">Terms of service</a>
+                <a href="privacy-policy.html">Privacy Policy</a>
+                <a href="contact-us.html">Contact us</a>
+              </div>
+              <div class="footer-section">
+                <h3>Quick Links</h3>
+                <a href="typing-test.html">Typing Test</a>
+                <a href="exam-wise-test.html">Exam Wise Test</a>
+                <a href="create-test.html">Create Own Test</a>
+                <a href="typing-class.html">Typing Class</a>
+                <a href="blog.html">Blog</a>
+                <a href="faqs.html">FAQs</a>
+              </div>
+              <div class="footer-section social-contacts">
+                <h3>Social Contacts</h3>
+                <p>Follow only for Exams and Typing related matters.</p>
+                <a href="https://whatsapp.com" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                <a href="https://instagram.com" target="_blank"><i class="fab fa-instagram"></i></a>
+                <a href="https://twitter.com" target="_blank"><i class="fab fa-twitter"></i></a>
+                <a href="https://telegram.org" target="_blank"><i class="fab fa-telegram"></i></a>
+                <a href="mailto:support@typinghub.in"><i class="fas fa-envelope"></i></a>
+                <p class="email"><a href="mailto:support@typinghub.in">support@typinghub.in</a></p>
+              </div>
+            </div>
+            <p class="footer-copyright">Copyright © 2024 TypingHub.in</p>
+          </footer>
+        `;
+        initializeNavigation();
+      });
+
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+      searchInput.addEventListener('input', filterExamCards);
+    } else {
+      console.warn('Search input element not found');
+    }
+  </script>
+</body>
+</html>

@@ -1,43 +1,4 @@
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -1317,128 +1278,180 @@
         if (!response.ok) {
           throw new Error(`Failed to fetch passages: ${response.status}`);
         }
-        passages = await response.json();
-        console.log('Passages fetched for Typing Test:', passages);
+        const data = await response.json();
+        passages = Array.isArray(data) ? data : [];
+        console.log('Fetched passages:', passages.length);
       } catch (error) {
         console.error('Error fetching passages:', error.message);
         passages = [];
-        sampleText.textContent = 'Error loading passages. Please try again later.';
       }
     }
 
     // Populate passage selector
     async function populatePassageSelector() {
-      await fetchPassages();
-      passageSelector.innerHTML = '<option value="">Select Passage</option>';
-      if (passages.length === 0) {
-        passageSelector.innerHTML += '<option value="" disabled>No passages available</option>';
-        sampleText.textContent = 'No passages available for Typing Test. Please contact the admin.';
-        return;
-      }
+      try {
+        await fetchPassages();
+        
+        // Clear existing options
+        passageSelector.innerHTML = '';
+        
+        // Add default option
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'Select Passage';
+        passageSelector.appendChild(defaultOption);
 
-      let validPassages = 0;
-      passages.forEach((passage, index) => {
-        if (passage.title && passage.content) {
-          // No length validation; include all passages
-          const option = document.createElement('option');
-          option.value = index.toString();
-          option.textContent = passage.title || `Passage ${index + 1}`;
-          passageSelector.appendChild(option);
-          validPassages++;
+        if (passages.length === 0) {
+          const noPassagesOption = document.createElement('option');
+          noPassagesOption.value = '';
+          noPassagesOption.disabled = true;
+          noPassagesOption.textContent = 'No passages available';
+          passageSelector.appendChild(noPassagesOption);
+          
+          if (sampleText) {
+            sampleText.textContent = 'No passages available for Typing Test. Please contact the admin.';
+          }
+          return;
         }
-      });
 
-      if (validPassages === 0) {
-        passageSelector.innerHTML += '<option value="" disabled>No valid passages available</option>';
-        sampleText.textContent = 'No valid passages available for Typing Test. Please contact the admin.';
-        return;
-      }
+        // Add passage options
+        passages.forEach((passage, index) => {
+          if (passage && passage.title && passage.content) {
+            const option = document.createElement('option');
+            option.value = index.toString();
+            option.textContent = passage.title;
+            passageSelector.appendChild(option);
+          }
+        });
 
-      if (passages.length > 0) {
-        passageSelector.value = '0';
-        displayPassage();
+        // Select first passage by default if available
+        if (passages.length > 0) {
+          passageSelector.value = '0';
+          displayPassage();
+        }
+      } catch (error) {
+        console.error('Error populating passage selector:', error);
+        if (sampleText) {
+          sampleText.textContent = 'Error loading passages. Please try again later.';
+        }
       }
     }
 
     // Calculate approximate words per line
     function calculateWordsPerLine() {
-      const containerWidth = sampleTextContainer.clientWidth;
-      const tempSpan = document.createElement('span');
-      tempSpan.style.fontSize = '18px';
-      tempSpan.style.fontFamily = "'Times New Roman', Times, serif";
-      tempSpan.style.visibility = 'hidden';
-      tempSpan.textContent = passageWords.join(' ');
-      sampleText.appendChild(tempSpan);
+      if (!passageWords || !passageWords.length || !sampleTextContainer) {
+        wordsPerLine = 1;
+        return;
+      }
 
-      const words = passageWords;
-      let currentLineWidth = 0;
-      let wordCount = 0;
-      let totalWords = 0;
-      const lineHeight = 28;
-      const containerHeight = sampleTextContainer.clientHeight;
-
-      words.forEach(word => {
-        const wordSpan = document.createElement('span');
-        wordSpan.className = 'word';
-        wordSpan.textContent = word + ' ';
-        tempSpan.appendChild(wordSpan);
-        const wordWidth = wordSpan.offsetWidth;
-        if (currentLineWidth + wordWidth > containerWidth - 20) {
-          totalWords += wordCount;
-          wordCount = 0;
-          currentLineWidth = 0;
+      try {
+        const containerWidth = sampleTextContainer.clientWidth;
+        if (!containerWidth) {
+          wordsPerLine = 1;
+          return;
         }
-        currentLineWidth += wordWidth;
-        wordCount++;
-      });
-      totalWords += wordCount;
 
-      wordsPerLine = totalWords / (tempSpan.offsetHeight / lineHeight) || 1;
-      wordsPerLine = Math.floor(wordsPerLine);
-      tempSpan.remove();
+        const tempSpan = document.createElement('span');
+        tempSpan.style.fontSize = '18px';
+        tempSpan.style.fontFamily = "'Times New Roman', Times, serif";
+        tempSpan.style.visibility = 'hidden';
+        tempSpan.style.position = 'absolute';
+        tempSpan.style.whiteSpace = 'nowrap';
+        document.body.appendChild(tempSpan);
+
+        let currentLineWidth = 0;
+        let wordCount = 0;
+        let totalWords = 0;
+        const lineHeight = 28;
+
+        passageWords.forEach(word => {
+          if (!word) return;
+          tempSpan.textContent = word + ' ';
+          const wordWidth = tempSpan.offsetWidth;
+          
+          if (currentLineWidth + wordWidth > containerWidth - 20) {
+            totalWords += wordCount;
+            wordCount = 1;
+            currentLineWidth = wordWidth;
+          } else {
+            wordCount++;
+            currentLineWidth += wordWidth;
+          }
+        });
+        totalWords += wordCount;
+
+        document.body.removeChild(tempSpan);
+        const calculatedWordsPerLine = Math.floor(totalWords / Math.ceil(currentLineWidth / (containerWidth - 20)));
+        wordsPerLine = Math.max(1, calculatedWordsPerLine);
+      } catch (error) {
+        console.error('Error calculating words per line:', error);
+        wordsPerLine = 1;
+      }
     }
 
     // Display selected passage
     function displayPassage() {
-      const selectedPassageIndex = passageSelector.value;
-      const passage = passages[parseInt(selectedPassageIndex)];
-      if (passage && passage.title && passage.content) {
-        passageWords = passage.content.trim().split(/\s+/);
-        sampleText.innerHTML = '';
-        wordElements = [];
-        passageWords.forEach((word, index) => {
-          const wordSpan = document.createElement('span');
-          wordSpan.className = 'word';
-          wordSpan.innerHTML = word.split('').map(char => `<span>${sanitizeInput(char)}</span>`).join('');
-          if (index === currentWordIndex) {
-            wordSpan.classList.add('current-word');
-          }
-          sampleText.appendChild(wordSpan);
-          sampleText.appendChild(document.createTextNode(' '));
-          wordElements.push(wordSpan);
-        });
-        calculateWordsPerLine();
-      } else if (passages.length > 0 && passages[0].title && passages[0].content) {
-        passageSelector.value = '0';
-        passageWords = passages[0].content.trim().split(/\s+/);
-        sampleText.innerHTML = '';
-        wordElements = [];
-        passageWords.forEach((word, index) => {
-          const wordSpan = document.createElement('span');
-          wordSpan.className = 'word';
-          wordSpan.innerHTML = word.split('').map(char => `<span>${sanitizeInput(char)}</span>`).join('');
-          if (index === currentWordIndex) {
-            wordSpan.classList.add('current-word');
-          }
-          sampleText.appendChild(wordSpan);
-          sampleText.appendChild(document.createTextNode(' '));
-          wordElements.push(wordSpan);
-        });
-        calculateWordsPerLine();
-      } else {
-        sampleText.textContent = 'No passages available for Typing Test. Please contact the admin.';
+      try {
+        if (!sampleText || !passageSelector) {
+          console.error('Required elements not found');
+          return;
+        }
+
+        // Reset state
         passageWords = [];
         wordElements = [];
+        sampleText.innerHTML = '';
+
+        const selectedPassageIndex = parseInt(passageSelector.value);
+        if (isNaN(selectedPassageIndex)) {
+          sampleText.textContent = 'Please select a passage';
+          return;
+        }
+
+        if (!passages || !Array.isArray(passages) || selectedPassageIndex >= passages.length) {
+          sampleText.textContent = 'No valid passages available';
+          return;
+        }
+
+        const passage = passages[selectedPassageIndex];
+        if (!passage || !passage.content || typeof passage.content !== 'string') {
+          sampleText.textContent = 'Invalid passage selected';
+          return;
+        }
+
+        // Split content into words and create elements
+        passageWords = passage.content.trim().split(/\s+/).filter(word => word.length > 0);
+        
+        if (passageWords.length === 0) {
+          sampleText.textContent = 'Selected passage is empty';
+          return;
+        }
+
+        passageWords.forEach((word, index) => {
+          const wordSpan = document.createElement('span');
+          wordSpan.className = 'word';
+          wordSpan.innerHTML = word.split('').map(char => `<span>${sanitizeInput(char)}</span>`).join('');
+          if (index === currentWordIndex) {
+            wordSpan.classList.add('current-word');
+          }
+          sampleText.appendChild(wordSpan);
+          sampleText.appendChild(document.createTextNode(' '));
+          wordElements.push(wordSpan);
+        });
+
+        // Only calculate words per line after we have valid content
+        if (sampleTextContainer && sampleTextContainer.clientWidth) {
+          calculateWordsPerLine();
+        } else {
+          wordsPerLine = 1;
+        }
+      } catch (error) {
+        console.error('Error displaying passage:', error);
+        passageWords = [];
+        wordElements = [];
+        if (sampleText) {
+          sampleText.textContent = 'Error displaying passage. Please try again.';
+        }
       }
     }
 
@@ -1500,68 +1513,68 @@
       }
     }
 
-    // Calculate and update results
+    // Calculate test results
     function calculateResults() {
-      const elapsedTimeSeconds = startTime ? (Date.now() - startTime) / 1000 : 0;
-      const elapsedTimeMinutes = Math.max(elapsedTimeSeconds / 60, 0.0167);
-
-      const typedText = normalizeQuotes(typingArea.value);
-      totalChars = typedText.length;
-      correctChars = 0;
-      const typedWordsCurrent = typedText.trim().split(/\s+/);
-      const expectedText = normalizeQuotes(passageWords.slice(0, typedWordsCurrent.length).join(' '));
-
-      // Calculate correct characters and mistakes
-      let punctuationMistakes = 0;
-      for (let i = 0; i < typedText.length; i++) {
-        if (i < expectedText.length) {
-          if (typedText[i] === expectedText[i]) {
-            correctChars++;
+      const elapsedTime = (Date.now() - startTime) / 1000 / 60; // in minutes
+      const typedText = typingArea.value;
+      const words = typedText.trim().split(/\s+/);
+      
+      // Calculate total words typed
+      const totalWordsTyped = words.length;
+      
+      // Calculate correct and incorrect words
+      correctWordsCount = 0;
+      incorrectWordsCount = 0;
+      mistakes = 0;
+      
+      words.forEach((word, index) => {
+        if (index < passageWords.length) {
+          if (word === passageWords[index]) {
+            correctWordsCount++;
           } else {
-            if (isPunctuation(expectedText[i]) || isPunctuation(typedText[i])) {
-              punctuationMistakes++;
+            incorrectWordsCount++;
+            // Count character mistakes
+            const expectedWord = passageWords[index];
+            for (let i = 0; i < Math.max(word.length, expectedWord.length); i++) {
+              if (word[i] !== expectedWord[i]) {
+                mistakes++;
+              }
             }
           }
-        } else {
-          if (isPunctuation(typedText[i])) {
-            punctuationMistakes++;
-          }
         }
-      }
-
-      for (let i = typedText.length; i < expectedText.length; i++) {
-        if (isPunctuation(expectedText[i])) {
-          punctuationMistakes++;
-        }
-      }
-
-      // Total mistakes: non-punctuation errors are full mistakes, punctuation errors are half
-      const nonPunctuationMistakes = (totalChars - correctChars) - punctuationMistakes;
-      mistakes = nonPunctuationMistakes + (punctuationMistakes * 0.5);
-
-      const grossWords = totalChars / 5;
-      const grossWpm = grossWords / elapsedTimeMinutes;
-
-      const netWords = correctChars / 5;
-      const netWpm = netWords / elapsedTimeMinutes;
-
-      const accuracyPercent = totalChars > 0 ? Math.min(100, (correctChars / totalChars) * 100) : 0;
-
-      requestAnimationFrame(() => {
-        grossSpeed.textContent = Math.round(grossWpm);
-        netSpeed.textContent = Math.round(netWpm);
-        accuracy.textContent = Math.round(accuracyPercent);
-        mistakesDisplay.textContent = mistakes.toFixed(1);
-        totalWords.textContent = typedWords.length;
-        correctWords.textContent = correctWordsCount;
-        incorrectWords.textContent = incorrectWordsCount;
       });
+
+      // Calculate speeds
+      const grossWPM = Math.round((totalWordsTyped / elapsedTime) || 0);
+      const netWPM = Math.round((correctWordsCount / elapsedTime) || 0);
+      
+      // Calculate accuracy
+      const accuracyPercent = Math.round((correctWordsCount / totalWordsTyped * 100) || 0);
+
+      // Update display
+      grossSpeed.textContent = grossWPM.toString();
+      netSpeed.textContent = netWPM.toString();
+      accuracy.textContent = accuracyPercent.toString();
+      mistakesDisplay.textContent = mistakes.toString();
+      totalWords.textContent = totalWordsTyped.toString();
+      correctWords.textContent = correctWordsCount.toString();
+      incorrectWords.textContent = incorrectWordsCount.toString();
+
+      return {
+        grossWPM,
+        netWPM,
+        accuracyPercent,
+        mistakes,
+        totalWordsTyped,
+        correctWordsCount,
+        incorrectWordsCount
+      };
     }
 
     // Generate feedback based on results
     function generateFeedback() {
-      const grossWpm = parseInt(grossSpeed.textContent) || 0;
-      const netWpm = parseInt(netSpeed.textContent) || 0;
+      const grossWPM = parseInt(grossSpeed.textContent) || 0;
+      const netWPM = parseInt(netSpeed.textContent) || 0;
       const accuracyPercent = parseInt(accuracy.textContent) || 0;
 
       let feedback = '';
@@ -1577,23 +1590,23 @@
 
       // Speed feedback if accuracy is decent
       if (accuracyPercent >= 70) {
-        if (grossWpm === 0) {
+        if (grossWPM === 0) {
           feedback += ' Typing start karo—practice se hi progress hogi!';
-        } else if (grossWpm <= 19) {
+        } else if (grossWPM <= 19) {
           feedback += ' Shuruaat ho chuki hai, ab roz thoda practice karo!';
-        } else if (grossWpm <= 29) {
+        } else if (grossWPM <= 29) {
           feedback += ' Achhi progress hai, lekin 35 WPM tak pahunchne ke liye lagataar typing karo!';
-        } else if (grossWpm <= 34) {
+        } else if (grossWPM <= 34) {
           feedback += ' Bas thoda aur push karo, 35 WPM bilkul paas hai!';
-        } else if (grossWpm <= 44) {
+        } else if (grossWPM <= 44) {
           feedback += ' Great job! Aapki typing speed government standards ke kareeb hai!';
-        } else if (grossWpm <= 59) {
+        } else if (grossWPM <= 59) {
           feedback += ' Bahut badhiya! Aap pro level ke kareeb ho!';
         } else {
           feedback += ' Excellent speed! Aap typing master banne wale ho!';
         }
 
-        if (netWpm < grossWpm * 0.8) {
+        if (netWPM < grossWPM * 0.8) {
           feedback += ' Lekin thoda consistency laao, net speed aur badh sakti hai!';
         }
       }

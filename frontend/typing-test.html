@@ -1622,17 +1622,23 @@
 
     // Submit test (manual or auto)
     function submitTest() {
+      // Stop the timer and update state
       clearInterval(timerInterval);
       isRunning = false;
+      
+      // Update UI elements
       typingArea.disabled = true;
       startButton.disabled = false;
       pauseButton.disabled = true;
       restartButton.disabled = false;
       submitButton.disabled = true;
       pauseButton.textContent = 'Pause';
+      
+      // Calculate and show results
       calculateResults();
       generateFeedback();
-      // Do not call restartTest here to preserve feedback
+      
+      // Reset counters but preserve feedback
       currentWordIndex = 0;
       currentLine = 0;
       typedWords = [];
@@ -1641,9 +1647,18 @@
       mistakes = 0;
       correctWordsCount = 0;
       incorrectWordsCount = 0;
+      
+      // Reset scroll position
       sampleTextContainer.scrollTop = 0;
-      displayPassage();
+      
+      // Clear typing area
       typingArea.value = '';
+      
+      // Only display passage if it's not already displayed correctly
+      const currentPassage = passages[parseInt(passageSelector.value)];
+      if (!currentPassage || !sampleText.textContent.includes(currentPassage.content)) {
+        displayPassage();
+      }
     }
 
     // Start test
@@ -1689,27 +1704,40 @@
 
     // Restart test
     function restartTest() {
+      // Clear timer and reset state
       clearInterval(timerInterval);
       isRunning = false;
       startTime = null;
+      
+      // Reset typing area
       typingArea.disabled = true;
       typingArea.value = '';
+      
+      // Reset word tracking
       currentWordIndex = 0;
       currentLine = 0;
       typedWords = [];
+      
+      // Reset metrics
       totalChars = 0;
       correctChars = 0;
       mistakes = 0;
       correctWordsCount = 0;
       incorrectWordsCount = 0;
+      
+      // Reset timer
       timeLeft = parseInt(timerDurationSelector.value) || 900;
       timerDisplay.textContent = formatTime(timeLeft);
       timerDisplay.classList.remove('low-time');
+      
+      // Reset buttons
       startButton.disabled = false;
       pauseButton.disabled = true;
       restartButton.disabled = true;
       submitButton.disabled = true;
       pauseButton.textContent = 'Pause';
+      
+      // Reset display metrics
       grossSpeed.textContent = '0';
       netSpeed.textContent = '0';
       accuracy.textContent = '0';
@@ -1717,10 +1745,19 @@
       totalWords.textContent = '0';
       correctWords.textContent = '0';
       incorrectWords.textContent = '0';
+      
+      // Reset feedback
       feedbackContainer.classList.remove('show');
       feedbackText.innerHTML = '';
+      
+      // Reset scroll position and display passage
       sampleTextContainer.scrollTop = 0;
-      displayPassage();
+      
+      // Only display passage if it's not already displayed correctly
+      const currentPassage = passages[parseInt(passageSelector.value)];
+      if (!currentPassage || !sampleText.textContent.includes(currentPassage.content)) {
+        displayPassage();
+      }
     }
 
     // Event listeners
@@ -1735,9 +1772,26 @@
       incorrectWordsCount = 0;
       typingArea.value = '';
       sampleTextContainer.scrollTop = 0;
-      displayPassage();
+      displayPassage(); // This will reset and display the new passage
       if (!isRunning) {
-        restartTest();
+        // Don't call restartTest() as it would trigger displayPassage() again
+        timeLeft = parseInt(timerDurationSelector.value) || 900;
+        timerDisplay.textContent = formatTime(timeLeft);
+        timerDisplay.classList.remove('low-time');
+        startButton.disabled = false;
+        pauseButton.disabled = true;
+        restartButton.disabled = true;
+        submitButton.disabled = true;
+        pauseButton.textContent = 'Pause';
+        grossSpeed.textContent = '0';
+        netSpeed.textContent = '0';
+        accuracy.textContent = '0';
+        mistakesDisplay.textContent = '0';
+        totalWords.textContent = '0';
+        correctWords.textContent = '0';
+        incorrectWords.textContent = '0';
+        feedbackContainer.classList.remove('show');
+        feedbackText.innerHTML = '';
       }
     });
 
@@ -1884,9 +1938,16 @@
       e.preventDefault();
     });
 
+    // Initialize the application
     document.addEventListener('DOMContentLoaded', () => {
+      // Set initial timer display
       timerDisplay.textContent = formatTime(timeLeft);
+      
+      // Load passages and populate selector
+      // displayPassage will be called by populatePassageSelector only when needed
       populatePassageSelector();
+      
+      // Align the result section
       alignResultSection();
     });
 

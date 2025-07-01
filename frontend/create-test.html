@@ -1191,48 +1191,30 @@
     }
 
     function displayPassage() {
-      const selectedPassageIndex = passageSelector.value;
-      // Always clear DOM before rendering
-      passageWords = [];
-      wordElements = [];
       sampleText.innerHTML = '';
-      const passage = passages[parseInt(selectedPassageIndex)];
-      if (passage && passage.title && passage.content) {
+      wordElements = [];
+      const selectedPassageIndex = parseInt(passageSelector.value);
+      
+      if (isNaN(selectedPassageIndex) || !passages[selectedPassageIndex]) {
+        sampleText.textContent = 'Please select a passage';
+        return;
+      }
+
+      const passage = passages[selectedPassageIndex];
+      if (passage && passage.content) {
         passageWords = passage.content.trim().split(/\s+/);
-        wordElements = [];
         passageWords.forEach((word, index) => {
           const wordSpan = document.createElement('span');
           wordSpan.className = 'word';
           wordSpan.innerHTML = word.split('').map(char => `<span>${sanitizeInput(char)}</span>`).join('');
-          if (settings.mode === 'Screen Typing' && index === currentWordIndex) wordSpan.classList.add('current-word');
-          sampleText.appendChild(wordSpan);
-          if (index < passageWords.length - 1) {
-            sampleText.appendChild(document.createTextNode(' '));
+          if (settings.mode === 'Screen Typing' && index === currentWordIndex) {
+            wordSpan.classList.add('current-word');
           }
-          wordElements.push(wordSpan);
-        });
-        calculateWordsPerLine();
-        currentLine = 0;
-      } else if (passages.length > 0 && passages[0].title && passages[0].content) {
-        passageSelector.value = '0';
-        passageWords = passages[0].content.trim().split(/\s+/);
-        sampleText.innerHTML = '';
-        wordElements = [];
-        passageWords.forEach((word, index) => {
-          const wordSpan = document.createElement('span');
-          wordSpan.className = 'word';
-          wordSpan.innerHTML = word.split('').map(char => `<span>${sanitizeInput(char)}</span>`).join('');
-          if (settings.mode === 'Screen Typing' && index === currentWordIndex) wordSpan.classList.add('current-word');
           sampleText.appendChild(wordSpan);
           sampleText.appendChild(document.createTextNode(' '));
           wordElements.push(wordSpan);
         });
         calculateWordsPerLine();
-        currentLine = 0;
-      } else {
-        sampleText.textContent = 'No passages available. Please provide custom text or contact the admin.';
-        passageWords = [];
-        wordElements = [];
       }
     }
 
@@ -1397,7 +1379,7 @@
       sampleTextContainer.scrollTop = 0;
       // Only call displayPassage if passageSelector value changed
       if (passageSelector.value !== '') {
-        displayPassage();
+      displayPassage();
       }
       typingArea.value = '';
     }
@@ -1475,7 +1457,7 @@
       sampleTextContainer.scrollTop = 0;
       // Only call displayPassage if passageSelector value changed
       if (passageSelector.value !== '') {
-        displayPassage();
+      displayPassage();
       }
     }
 

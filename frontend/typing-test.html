@@ -1343,14 +1343,12 @@
         wordsPerLine = 1;
         return;
       }
-
       try {
         const containerWidth = sampleTextContainer.clientWidth;
         if (!containerWidth) {
           wordsPerLine = 1;
           return;
         }
-
         const tempSpan = document.createElement('span');
         tempSpan.style.fontSize = '18px';
         tempSpan.style.fontFamily = "'Times New Roman', Times, serif";
@@ -1358,17 +1356,14 @@
         tempSpan.style.position = 'absolute';
         tempSpan.style.whiteSpace = 'nowrap';
         document.body.appendChild(tempSpan);
-
         let currentLineWidth = 0;
         let wordCount = 0;
         let totalWords = 0;
         const lineHeight = 28;
-
         passageWords.forEach(word => {
           if (!word) return;
           tempSpan.textContent = word + ' ';
           const wordWidth = tempSpan.offsetWidth;
-          
           if (currentLineWidth + wordWidth > containerWidth - 20) {
             totalWords += wordCount;
             wordCount = 1;
@@ -1379,9 +1374,9 @@
           }
         });
         totalWords += wordCount;
-
         document.body.removeChild(tempSpan);
-        const calculatedWordsPerLine = Math.floor(totalWords / Math.ceil(currentLineWidth / (containerWidth - 20)));
+        // Prevent wordsPerLine from being zero
+        const calculatedWordsPerLine = Math.floor(totalWords / Math.max(1, Math.ceil(currentLineWidth / (containerWidth - 20))));
         wordsPerLine = Math.max(1, calculatedWordsPerLine);
       } catch (error) {
         console.error('Error calculating words per line:', error);
@@ -1396,37 +1391,29 @@
           console.error('Required elements not found');
           return;
         }
-
-        // Reset state
+        // Always clear DOM before rendering
         passageWords = [];
         wordElements = [];
         sampleText.innerHTML = '';
-
         const selectedPassageIndex = parseInt(passageSelector.value);
         if (isNaN(selectedPassageIndex)) {
           sampleText.textContent = 'Please select a passage';
           return;
         }
-
         if (!passages || !Array.isArray(passages) || selectedPassageIndex >= passages.length) {
           sampleText.textContent = 'No valid passages available';
           return;
         }
-
         const passage = passages[selectedPassageIndex];
         if (!passage || !passage.content || typeof passage.content !== 'string') {
           sampleText.textContent = 'Invalid passage selected';
           return;
         }
-
-        // Split content into words and create elements
         passageWords = passage.content.trim().split(/\s+/).filter(word => word.length > 0);
-        
         if (passageWords.length === 0) {
           sampleText.textContent = 'Selected passage is empty';
           return;
         }
-
         passageWords.forEach((word, index) => {
           const wordSpan = document.createElement('span');
           wordSpan.className = 'word';
@@ -1438,13 +1425,14 @@
           sampleText.appendChild(document.createTextNode(' '));
           wordElements.push(wordSpan);
         });
-
         // Only calculate words per line after we have valid content
         if (sampleTextContainer && sampleTextContainer.clientWidth) {
           calculateWordsPerLine();
         } else {
           wordsPerLine = 1;
         }
+        // Always ensure currentLine is reset
+        currentLine = 0;
       } catch (error) {
         console.error('Error displaying passage:', error);
         passageWords = [];
@@ -1463,15 +1451,14 @@
           word.classList.add('current-word');
         }
       });
-
-      const lineNumber = Math.floor(currentWordIndex / wordsPerLine);
+      // Prevent unnecessary scroll after first word
+      const lineNumber = Math.floor(currentWordIndex / Math.max(1, wordsPerLine));
       if (lineNumber > currentLine) {
         currentLine = lineNumber;
         const lineHeight = 28;
         const containerHeight = sampleTextContainer.clientHeight;
         const contentHeight = sampleText.offsetHeight;
         const maxScroll = contentHeight - containerHeight;
-
         if (sampleTextContainer.scrollTop < maxScroll) {
           sampleTextContainer.scrollTop += lineHeight;
         }
@@ -1622,23 +1609,16 @@
 
     // Submit test (manual or auto)
     function submitTest() {
-      // Stop the timer and update state
       clearInterval(timerInterval);
       isRunning = false;
-      
-      // Update UI elements
       typingArea.disabled = true;
       startButton.disabled = false;
       pauseButton.disabled = true;
       restartButton.disabled = false;
       submitButton.disabled = true;
       pauseButton.textContent = 'Pause';
-      
-      // Calculate and show results
       calculateResults();
       generateFeedback();
-      
-      // Reset counters but preserve feedback
       currentWordIndex = 0;
       currentLine = 0;
       typedWords = [];
@@ -1647,18 +1627,12 @@
       mistakes = 0;
       correctWordsCount = 0;
       incorrectWordsCount = 0;
-      
-      // Reset scroll position
       sampleTextContainer.scrollTop = 0;
-      
-      // Clear typing area
-      typingArea.value = '';
-      
-      // Only display passage if it's not already displayed correctly
-      const currentPassage = passages[parseInt(passageSelector.value)];
-      if (!currentPassage || !sampleText.textContent.includes(currentPassage.content)) {
+      // Only call displayPassage if passageSelector value changed
+      if (passageSelector.value !== '') {
         displayPassage();
       }
+      typingArea.value = '';
     }
 
     // Start test
@@ -1704,40 +1678,27 @@
 
     // Restart test
     function restartTest() {
-      // Clear timer and reset state
       clearInterval(timerInterval);
       isRunning = false;
       startTime = null;
-      
-      // Reset typing area
       typingArea.disabled = true;
       typingArea.value = '';
-      
-      // Reset word tracking
       currentWordIndex = 0;
       currentLine = 0;
       typedWords = [];
-      
-      // Reset metrics
       totalChars = 0;
       correctChars = 0;
       mistakes = 0;
       correctWordsCount = 0;
       incorrectWordsCount = 0;
-      
-      // Reset timer
       timeLeft = parseInt(timerDurationSelector.value) || 900;
       timerDisplay.textContent = formatTime(timeLeft);
       timerDisplay.classList.remove('low-time');
-      
-      // Reset buttons
       startButton.disabled = false;
       pauseButton.disabled = true;
       restartButton.disabled = true;
       submitButton.disabled = true;
       pauseButton.textContent = 'Pause';
-      
-      // Reset display metrics
       grossSpeed.textContent = '0';
       netSpeed.textContent = '0';
       accuracy.textContent = '0';
@@ -1745,17 +1706,11 @@
       totalWords.textContent = '0';
       correctWords.textContent = '0';
       incorrectWords.textContent = '0';
-      
-      // Reset feedback
       feedbackContainer.classList.remove('show');
       feedbackText.innerHTML = '';
-      
-      // Reset scroll position and display passage
       sampleTextContainer.scrollTop = 0;
-      
-      // Only display passage if it's not already displayed correctly
-      const currentPassage = passages[parseInt(passageSelector.value)];
-      if (!currentPassage || !sampleText.textContent.includes(currentPassage.content)) {
+      // Only call displayPassage if passageSelector value changed
+      if (passageSelector.value !== '') {
         displayPassage();
       }
     }

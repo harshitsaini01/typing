@@ -1386,34 +1386,18 @@
 
     // Display selected passage
     function displayPassage() {
-      try {
-        if (!sampleText || !passageSelector) {
-          console.error('Required elements not found');
-          return;
-        }
-        // Always clear DOM before rendering
-        passageWords = [];
-        wordElements = [];
-        sampleText.innerHTML = '';
-        const selectedPassageIndex = parseInt(passageSelector.value);
-        if (isNaN(selectedPassageIndex)) {
-          sampleText.textContent = 'Please select a passage';
-          return;
-        }
-        if (!passages || !Array.isArray(passages) || selectedPassageIndex >= passages.length) {
-          sampleText.textContent = 'No valid passages available';
-          return;
-        }
-        const passage = passages[selectedPassageIndex];
-        if (!passage || !passage.content || typeof passage.content !== 'string') {
-          sampleText.textContent = 'Invalid passage selected';
-          return;
-        }
-        passageWords = passage.content.trim().split(/\s+/).filter(word => word.length > 0);
-        if (passageWords.length === 0) {
-          sampleText.textContent = 'Selected passage is empty';
-          return;
-        }
+      sampleText.innerHTML = '';
+      wordElements = [];
+      const selectedPassageIndex = parseInt(passageSelector.value);
+      
+      if (isNaN(selectedPassageIndex) || !passages[selectedPassageIndex]) {
+        sampleText.textContent = 'Please select a passage';
+        return;
+      }
+
+      const passage = passages[selectedPassageIndex];
+      if (passage && passage.content) {
+        passageWords = passage.content.trim().split(/\s+/);
         passageWords.forEach((word, index) => {
           const wordSpan = document.createElement('span');
           wordSpan.className = 'word';
@@ -1425,21 +1409,7 @@
           sampleText.appendChild(document.createTextNode(' '));
           wordElements.push(wordSpan);
         });
-        // Only calculate words per line after we have valid content
-        if (sampleTextContainer && sampleTextContainer.clientWidth) {
-          calculateWordsPerLine();
-        } else {
-          wordsPerLine = 1;
-        }
-        // Always ensure currentLine is reset
-        currentLine = 0;
-      } catch (error) {
-        console.error('Error displaying passage:', error);
-        passageWords = [];
-        wordElements = [];
-        if (sampleText) {
-          sampleText.textContent = 'Error displaying passage. Please try again.';
-        }
+        calculateWordsPerLine();
       }
     }
 
@@ -1728,6 +1698,7 @@
       typingArea.value = '';
       sampleTextContainer.scrollTop = 0;
       displayPassage();
+      if (!isRunning) restartTest();
     });
 
     timerDurationSelector.addEventListener('change', () => {
@@ -1794,7 +1765,7 @@
         
         // Don't allow multiple spaces
         if (lastChar === ' ') {
-        e.preventDefault();
+          e.preventDefault();
           return;
         }
 
@@ -1812,13 +1783,13 @@
           } else {
             incorrectWordsCount++;
           }
-        currentWordIndex++;
-        updateWordHighlight();
-        updateLetterHighlight();
-        calculateResults();
+          currentWordIndex++;
+          updateWordHighlight();
+          updateLetterHighlight();
+          calculateResults();
 
-        if (currentWordIndex >= passageWords.length) {
-          submitTest();
+          if (currentWordIndex >= passageWords.length) {
+            submitTest();
           }
         }
       } else if (e.key === 'Backspace') {

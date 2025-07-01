@@ -1165,14 +1165,11 @@
       tempSpan.style.visibility = 'hidden';
       tempSpan.textContent = passageWords.join(' ');
       sampleText.appendChild(tempSpan);
-
       const words = passageWords;
       let currentLineWidth = 0;
       let wordCount = 0;
       let totalWords = 0;
       const lineHeight = 28;
-      const containerHeight = sampleTextContainer.clientHeight;
-
       words.forEach(word => {
         const wordSpan = document.createElement('span');
         wordSpan.className = 'word';
@@ -1188,18 +1185,20 @@
         wordCount++;
       });
       totalWords += wordCount;
-
       wordsPerLine = totalWords / (tempSpan.offsetHeight / lineHeight) || 1;
-      wordsPerLine = Math.floor(wordsPerLine);
+      wordsPerLine = Math.max(1, Math.floor(wordsPerLine));
       tempSpan.remove();
     }
 
     function displayPassage() {
       const selectedPassageIndex = passageSelector.value;
+      // Always clear DOM before rendering
+      passageWords = [];
+      wordElements = [];
+      sampleText.innerHTML = '';
       const passage = passages[parseInt(selectedPassageIndex)];
       if (passage && passage.title && passage.content) {
         passageWords = passage.content.trim().split(/\s+/);
-        sampleText.innerHTML = '';
         wordElements = [];
         passageWords.forEach((word, index) => {
           const wordSpan = document.createElement('span');
@@ -1213,6 +1212,7 @@
           wordElements.push(wordSpan);
         });
         calculateWordsPerLine();
+        currentLine = 0;
       } else if (passages.length > 0 && passages[0].title && passages[0].content) {
         passageSelector.value = '0';
         passageWords = passages[0].content.trim().split(/\s+/);
@@ -1228,6 +1228,7 @@
           wordElements.push(wordSpan);
         });
         calculateWordsPerLine();
+        currentLine = 0;
       } else {
         sampleText.textContent = 'No passages available. Please provide custom text or contact the admin.';
         passageWords = [];
@@ -1241,15 +1242,13 @@
         word.classList.remove('current-word');
         if (index === currentWordIndex) word.classList.add('current-word');
       });
-
-      const lineNumber = Math.floor(currentWordIndex / wordsPerLine);
+      const lineNumber = Math.floor(currentWordIndex / Math.max(1, wordsPerLine));
       if (lineNumber > currentLine) {
         currentLine = lineNumber;
         const lineHeight = 28;
         const containerHeight = sampleTextContainer.clientHeight;
         const contentHeight = sampleText.offsetHeight;
         const maxScroll = contentHeight - containerHeight;
-
         if (sampleTextContainer.scrollTop < maxScroll) {
           sampleTextContainer.scrollTop += lineHeight;
         }
@@ -1396,7 +1395,10 @@
       correctWordsCount = 0;
       incorrectWordsCount = 0;
       sampleTextContainer.scrollTop = 0;
-      displayPassage();
+      // Only call displayPassage if passageSelector value changed
+      if (passageSelector.value !== '') {
+        displayPassage();
+      }
       typingArea.value = '';
     }
 
@@ -1471,7 +1473,10 @@
       feedbackContainer.classList.remove('show');
       feedbackText.innerHTML = '';
       sampleTextContainer.scrollTop = 0;
-      displayPassage();
+      // Only call displayPassage if passageSelector value changed
+      if (passageSelector.value !== '') {
+        displayPassage();
+      }
     }
 
     function applySettings() {

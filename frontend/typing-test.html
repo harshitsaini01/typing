@@ -1727,27 +1727,7 @@
       incorrectWordsCount = 0;
       typingArea.value = '';
       sampleTextContainer.scrollTop = 0;
-      displayPassage(); // This will reset and display the new passage
-      if (!isRunning) {
-        // Don't call restartTest() as it would trigger displayPassage() again
-        timeLeft = parseInt(timerDurationSelector.value) || 900;
-        timerDisplay.textContent = formatTime(timeLeft);
-        timerDisplay.classList.remove('low-time');
-        startButton.disabled = false;
-        pauseButton.disabled = true;
-        restartButton.disabled = true;
-        submitButton.disabled = true;
-        pauseButton.textContent = 'Pause';
-        grossSpeed.textContent = '0';
-        netSpeed.textContent = '0';
-        accuracy.textContent = '0';
-        mistakesDisplay.textContent = '0';
-        totalWords.textContent = '0';
-        correctWords.textContent = '0';
-        incorrectWords.textContent = '0';
-        feedbackContainer.classList.remove('show');
-        feedbackText.innerHTML = '';
-      }
+      displayPassage();
     });
 
     timerDurationSelector.addEventListener('change', () => {

@@ -1402,9 +1402,6 @@
           const wordSpan = document.createElement('span');
           wordSpan.className = 'word';
           wordSpan.innerHTML = word.split('').map(char => `<span>${sanitizeInput(char)}</span>`).join('');
-          if (index === currentWordIndex) {
-            wordSpan.classList.add('current-word');
-          }
           sampleText.appendChild(wordSpan);
           sampleText.appendChild(document.createTextNode(' '));
           wordElements.push(wordSpan);
